@@ -1,2 +1,2 @@
-# SaluPorEso_DAM
+# Visionsync
 Proyecto VCM de ramo 'Desarrollo de aplicaciones móviles'
