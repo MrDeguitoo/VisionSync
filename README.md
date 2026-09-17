@@ -84,16 +84,18 @@ flowchart TD
 
 ## Pantallas principales
 
-| Pantalla | Objetivo | Usuario principal | Ubicación |
+| Pantalla | Objetivo | Usuario principal | Imágenes |
 |---|---|---|---|
-| Pantalla de Login | Autenticar al usuario y determinar su rol | Todos los perfiles | `docs/diseno/interfaces/login.png` |
-| Dashboard Principal (rol-dependiente) | Centralizar accesos rápidos por rol | Todos los perfiles | `docs/diseno/interfaces/dashboard_tecnologo.png` |
-| Formulario de Registro de Examen | Capturar datos clínicos y adjuntar archivo | Tecnólogo Médico | `docs/diseno/interfaces/formulario_registro.png` |
-| Confirmación de Envío / Validación | Confirmar guardado o mostrar errores de validación | Tecnólogo Médico | `docs/diseno/interfaces/confirmacion_envio.png` |
-| Buscador y Listado de Pacientes/Exámenes | Localizar pacientes o registros mediante filtros | Médico Oftalmólogo | `docs/diseno/interfaces/buscador_listado.png` |
-| Historial Clínico del Paciente | Mostrar cronológicamente los exámenes previos | Médico Oftalmólogo | `docs/diseno/interfaces/historial_clinico.png` |
-| Detalle de Examen (Reporte + Comentarios) | Ver reporte adjunto y registrar observaciones | Médico Oftalmólogo | `docs/diseno/interfaces/detalle_examen.png` |
-| Resumen de Examen | Mostrar resultado autorizado y estado de entrega | Paciente | `docs/diseno/interfaces/resumen_examen.png` |
+| Pantalla de Login | Autenticar al usuario y determinar su rol | Todos los perfiles | `docs/diseno/interfaces/Login.png` |
+| Dashboard Principal (rol-dependiente) | Centralizar accesos rápidos por rol | Todos los perfiles | `DashboardTecnologo.png` · `DashboardTecnologoInicio.png` · `DashboardMedicoOftalmologo.png` · `PortalPaciente.png` |
+| Formulario de Registro de Examen | Capturar datos clínicos y adjuntar archivo | Tecnólogo Médico | `docs/diseno/interfaces/RegistrarExamen.png` |
+| Confirmación de Envío / Validación | Confirmar guardado o mostrar errores de validación | Tecnólogo Médico | `docs/diseno/interfaces/ConfirmacionExamen.png` |
+| Buscador y Listado de Pacientes/Exámenes | Localizar pacientes o registros mediante filtros | Médico Oftalmólogo | `docs/diseno/interfaces/BusquedaExamenesOftalmologo.png` |
+| Historial Clínico del Paciente | Mostrar cronológicamente los exámenes previos | Médico Oftalmólogo | `docs/diseno/interfaces/HistorialClinicoLineaDelTiempo.png` |
+| Detalle de Examen (Reporte + Comentarios) | Ver reporte adjunto y registrar observaciones | Médico Oftalmólogo | `DetalleExamenOftalmologico.png` · `DetalleOftalmologico2.png` |
+| Resumen de Examen | Mostrar resultado autorizado y estado de entrega | Paciente | `docs/diseno/interfaces/ResumenExamenPaciente.png` |
+
+*Todas las imágenes se encuentran en `docs/diseno/interfaces/`. Algunas pantallas tienen más de una variante (ej. distintos estados del Dashboard según el rol, o vistas colapsada/expandida del Detalle de Examen).*
 
 ---
 
