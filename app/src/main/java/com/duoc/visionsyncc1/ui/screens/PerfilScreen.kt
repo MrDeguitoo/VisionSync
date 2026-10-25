@@ -1,4 +1,4 @@
-package com.duoc.visionsyncc1.ui.theme.screens
+package com.duoc.visionsyncc1.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,15 +20,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.duoc.visionsyncc1.R
-import com.duoc.visionsyncc1.ui.theme.components.PerfilCard
+import com.duoc.visionsyncc1.ui.components.PerfilCard
 import com.duoc.visionsyncc1.viewmodel.PerfilViewModel
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
-fun PerfilScreen(viewModel: PerfilViewModel){
+fun PerfilScreen(
+    viewModel: PerfilViewModel = viewModel(),
+    onPerfilTecnologo: () -> Unit = {},
+    onPerfilMedico: () -> Unit = {},
+    onPerfilPaciente: () -> Unit = {}
+){
     val perfilActivo = viewModel.perfilSeleccionado.collectAsState()
     Column(
         modifier = Modifier
@@ -68,7 +74,13 @@ fun PerfilScreen(viewModel: PerfilViewModel){
     Spacer (modifier = Modifier.weight(1f))
 
     Button(
-        onClick = { },
+        onClick = {
+            when (perfilActivo.value.id){
+                1 -> onPerfilMedico()
+                2 -> onPerfilTecnologo()
+                3 -> onPerfilPaciente()
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(52.dp),
@@ -101,5 +113,5 @@ fun PerfilScreen(viewModel: PerfilViewModel){
 @Preview(showBackground = true)
 @Composable
 fun PerfilScreenPreview() {
-    PerfilScreen(PerfilViewModel())
+    PerfilScreen()
 }
