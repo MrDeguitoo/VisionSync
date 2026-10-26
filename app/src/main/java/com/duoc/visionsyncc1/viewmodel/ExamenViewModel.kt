@@ -7,6 +7,7 @@ import com.duoc.visionsyncc1.repository.ExamenRepository
 import kotlinx.coroutines.flow.*
 
 class ExamenesViewModel(private val repo: ExamenRepository) : ViewModel() {
+
     private val _busqueda = MutableStateFlow("")
     val busqueda: StateFlow<String> = _busqueda.asStateFlow()
 
