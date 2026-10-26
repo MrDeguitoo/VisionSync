@@ -1,26 +1,26 @@
 package com.duoc.visionsyncc1.data
+
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duoc.visionsyncc1.model.ExamenEntity
 
-class AppDatabase {
-    @Database(entities = [ExamenEntity::class], version = 1, exportSchema = false)
-    abstract class AppDatabase : RoomDatabase() {
-        abstract fun examenDao(): ExamenDao
+@Database(entities = [ExamenEntity::class], version = 1, exportSchema = false)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun examenDao(): ExamenDao
 
-        companion object {
-            @Volatile private var INSTANCE: AppDatabase? = null
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
 
-            fun getInstance(context: Context): AppDatabase =
-                INSTANCE ?: synchronized(this) {
-                    Room.databaseBuilder(
-                        context.applicationContext,
-                        AppDatabase::class.java,
-                        "visionsync.db"
-                    ).build().also { INSTANCE = it }
-                }
-        }
+        fun getInstance(context: Context): AppDatabase =
+            INSTANCE ?: synchronized(this) {
+                Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "visionsync.db"
+                ).build().also { INSTANCE = it }
+            }
     }
 }
