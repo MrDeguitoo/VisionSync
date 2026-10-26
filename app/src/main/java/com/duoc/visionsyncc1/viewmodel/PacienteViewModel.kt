@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.stateIn
 
 class PacienteViewModel(
     private val repository: ExamenRepository
-) : viewModel(){
+) : ViewModel() {
+
     val examenesAutorizados: StateFlow<List<ExamenEntity>> =
         repository.observarAutorizados()
             .stateIn(
@@ -19,9 +20,4 @@ class PacienteViewModel(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )
-}
-
-class PacienteViewModelFactory(private val repo: ExamenRepository) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = PacienteViewModel(repo) as T
 }
