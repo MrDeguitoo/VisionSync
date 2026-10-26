@@ -7,18 +7,20 @@
 <p align="center">
 <img src="docs/diseno/Logo_VisionSync.png" alt="Logo VisionSync" width="220"/>
 </p>
-
 ---
 
-## 1. Descripción del Proyecto y Problema Clínico
-En la práctica oftalmológica actual, los exámenes especializados (campimetría computarizada, topografía corneal, tomografía de coherencia óptica - OCT, agudeza visual, tonometría) se generan en múltiples formatos aislados (PDF, imágenes, exportaciones propietarias). Estos archivos suelen quedar dispersos en carpetas locales, correos o impresiones físicas, careciendo de una ficha clínica digital unificada. Esta fragmentación incrementa los tiempos de espera en consulta, dificulta la comparación longitudinal de patologías y eleva el riesgo de pérdida de información médica sensible.
+El logo traduce visualmente el nombre: un ojo formado por líneas curvas en movimiento que convergen hacia el centro, representando datos dispersos que se unifican (el "Sync"). Los tonos azules aportan confianza y carácter clínico/tecnológico.
 
-**VisionSync** es una solución móvil nativa desarrollada en **Kotlin** y **Jetpack Compose** bajo arquitectura **MVVM**. Centraliza los registros oftalmológicos en una base de datos local robusta (**Room**), asegurando persistencia, reactividad en tiempo real y una separación estricta de accesos mediante tres perfiles clínicos:
-1. **Tecnólogo Médico:** Captura datos del paciente, valida el estudio y adjunta el informe mediante el selector nativo del sistema.
-2. **Médico Oftalmólogo:** Consulta el historial, filtra por paciente o tipo de examen, emite observaciones clínicas y autoriza los resultados.
-3. **Paciente:** Visualiza de forma segura y exclusiva sus exámenes autorizados y el resumen de diagnóstico.
+### Paleta de colores
 
----
+| Color | HEX | Uso en la app |
+|---|---|---|
+| 🟦 Principal | `#3A4BBE` | Primario/marca (identidad, acción principal) |
+| 🔵 Secundario | `#3F8EFC` | Interactivo/secundario (links, elementos táctiles) |
+| ⬜ Fondo | `#F7F4F3` | Base/fondo (pantallas, tarjetas) |
+| 🔷 Texto | `#1E3B48` | Contenido (texto, íconos informativos) |
+| ⬛ Adicional | `#000000` | Énfasis máximo (uso puntual) |
+| 🟩 Adicional | `#20A39E` | Confirmación/éxito (estados positivos) |
 
 ## 2. Identidad Visual y Diseño
 La identidad gráfica de VisionSync está inspirada en las líneas de escaneo ocular convergentes hacia un punto focal, simbolizando la integración de datos clínicos dispersos (*"Sync"*).
@@ -27,21 +29,10 @@ La identidad gráfica de VisionSync está inspirada en las líneas de escaneo oc
   <img src="docs/diseno/Logo_VisionSync.png" alt="Logo VisionSync" width="220"/>
 </p>
 
-### Paleta de Colores Institucional (Material Design 3)
-| Muestra | Nombre | Código HEX | Rol y Aplicación en la App |
-| :---: | :--- | :---: | :--- |
-| 🟦 | **Principal / Marca** | `#3A4BBE` | Identidad primaria, barras de navegación y botones de acción principal. |
-| 🔵 | **Secundario** | `#3F8EFC` | Elementos táctiles interactivos, links y estados activos. |
-| ⬜ | **Superficie / Fondo** | `#F7F4F3` | Fondo de pantallas, tarjetas y contenedores (`surface`). |
-| 🔷 | **Texto / Contenido** | `#1E3B48` | Tipografía principal, títulos e íconos informativos de alto contraste. |
-| 🟩 | **Éxito / Confirmación** | `#20A39E` | Mensajes de confirmación, estados autorizados e indicador de conexión activa. |
-| ⬛ | **Énfasis / Neutro** | `#000000` | Textos de énfasis puntual y bordes de contraste. |
+## Flujo de usuario (Diagrama de Actividad UML)
 
----
+Recorrido principal end-to-end: registro del examen → revisión clínica → consulta del paciente.
 
-## 3. Flujo de Trabajo y Arquitectura del Sistema
-
-### 3.1 Diagrama de Actividad UML (Flujo End-to-End)
 ```mermaid
 flowchart TD
     subgraph TM["👤 Tecnólogo Médico"]
