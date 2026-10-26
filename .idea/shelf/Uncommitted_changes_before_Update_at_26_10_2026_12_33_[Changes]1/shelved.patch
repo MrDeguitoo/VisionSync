@@ -1,0 +1,9 @@
+Index: .idea/.name
+===================================================================
+diff --git a/.idea/.name b/.idea/.name
+deleted file mode 100644
+--- a/.idea/.name	(revision eb596db17a4d44c59f35c47865204a29fb54e4ef)
++++ /dev/null	(revision eb596db17a4d44c59f35c47865204a29fb54e4ef)
+@@ -1,1 +0,0 @@
+-VisionSyncc1
+\ No newline at end of file
