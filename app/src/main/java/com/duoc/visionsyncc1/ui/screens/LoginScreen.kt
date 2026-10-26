@@ -2,6 +2,8 @@ package com.duoc.visionsyncc1.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -9,38 +11,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.duoc.visionsyncc1.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel = viewModel(),
     onLoginExitoso: () -> Unit,
     onVolver: () -> Unit
 ) {
-    var usuario by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var errorUsuario by remember { mutableStateOf<String?>(null) }
-    var errorPassword by remember { mutableStateOf<String?>(null) }
-
-    fun validarEIniciar() {
-        var valido = true
-        if (usuario.trim().isBlank()) {
-            errorUsuario = "El usuario es obligatorio"
-            valido = false
-        } else {
-            errorUsuario = null
-        }
-
-        if (password.trim().isBlank()) {
-            errorPassword = "La contraseña es obligatoria"
-            valido = false
-        } else {
-            errorPassword = null
-        }
-
-        if (valido) {
-            onLoginExitoso()
-        }
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -48,7 +29,10 @@ fun LoginScreen(
                 title = { Text("Acceso Tecnólogo") },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
-                        Text("←", style = MaterialTheme.typography.titleLarge)
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
                     }
                 }
             )
@@ -67,24 +51,17 @@ fun LoginScreen(
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-            Text(
-                text = "Módulo de Tecnólogo Médico",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
             Spacer(modifier = Modifier.height(24.dp))
 
             // Campo Usuario
             OutlinedTextField(
-                value = usuario,
-                onValueChange = {
-                    usuario = it
-                    if (errorUsuario != null) errorUsuario = null
+                value = uiState.usuario,
+                onValueChange = viewModel::onUsuarioChange,
+                label = { Text("Usuario / Correo") },
+                isError = uiState.usuarioError != null,
+                supportingText = {
+                    uiState.usuarioError?.let { Text(it) }
                 },
-                label = { Text("Usuario o correo") },
-                isError = errorUsuario != null,
-                supportingText = { errorUsuario?.let { Text(it) } },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -93,26 +70,31 @@ fun LoginScreen(
 
             // Campo Contraseña
             OutlinedTextField(
-                value = password,
-                onValueChange = {
-                    password = it
-                    if (errorPassword != null) errorPassword = null
-                },
+                value = uiState.contrasena,
+                onValueChange = viewModel::onContrasenaChange,
                 label = { Text("Contraseña") },
-                isError = errorPassword != null,
-                supportingText = { errorPassword?.let { Text(it) } },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                isError = uiState.contrasenaError != null,
+                supportingText = {
+                    uiState.contrasenaError?.let { Text(it) }
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón Iniciar Sesión
             Button(
-                onClick = { validarEIniciar() },
-                modifier = Modifier.fillMaxWidth()
+                onClick = {
+                    if (viewModel.intentarLogin()) {
+                        viewModel.limpiarEstadoExito()
+                        onLoginExitoso()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
             ) {
                 Text("Ingresar")
             }

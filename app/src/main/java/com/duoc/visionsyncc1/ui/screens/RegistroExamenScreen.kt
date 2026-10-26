@@ -1,6 +1,9 @@
 package com.duoc.visionsyncc1.ui.screens
 
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -17,7 +20,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duoc.visionsyncc1.viewmodel.GuardadoState
 import com.duoc.visionsyncc1.viewmodel.RegistroExamenViewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroExamenScreen(
@@ -30,14 +32,26 @@ fun RegistroExamenScreen(
     val guardadoState by viewModel.guardado.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Recurso Nativo 1: Storage Access Framework (SAF) con OpenDocument
+    // Estado local para recordar el nombre amigable del archivo seleccionado
+    var nombreArchivoSeleccionado by remember { mutableStateOf<String?>(null) }
+
+    // Recurso Nativo 1: Storage Access Framework (SAF) mediante OpenDocument
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
         uri?.let {
-            context.contentResolver.takePersistableUriPermission(
-                it, Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: SecurityException) {
+                // Previene caídas si el proveedor del archivo no soporta permisos persistentes
+            }
+
+            // Extraer nombre legible desde el ContentResolver
+            val nombreExtraido = obtenerNombreArchivo(context, it)
+            nombreArchivoSeleccionado = nombreExtraido
             viewModel.onArchivoSeleccionado(it.toString())
         }
     }
@@ -47,6 +61,7 @@ fun RegistroExamenScreen(
             is GuardadoState.Exito -> {
                 snackbarHostState.showSnackbar("Examen registrado exitosamente")
                 viewModel.limpiarFormulario()
+                nombreArchivoSeleccionado = null
                 onGuardadoExitoso()
             }
             is GuardadoState.Error -> {
@@ -63,7 +78,10 @@ fun RegistroExamenScreen(
                 title = { Text("Registrar Examen Oftalmológico") },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
                     }
                 }
             )
@@ -128,7 +146,7 @@ fun RegistroExamenScreen(
                     isError = formState.tipoError != null,
                     supportingText = { formState.tipoError?.let { Text(it) } },
                     modifier = Modifier
-                        .menuAnchor()
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
@@ -147,7 +165,7 @@ fun RegistroExamenScreen(
                 }
             }
 
-            // Card Selector de Archivo Nativo
+            // Tarjeta de Selector de Archivo Nativo (SAF)
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.outlinedCardColors(
@@ -167,10 +185,11 @@ fun RegistroExamenScreen(
                         Text("Adjuntar Informe (PDF o Imagen)")
                     }
 
+                    // Despliegue del nombre legible
                     if (formState.archivoUri != null) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Archivo seleccionado: ${formState.archivoUri}",
+                            text = "Archivo seleccionado: ${nombreArchivoSeleccionado ?: "Archivo cargado"}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -189,7 +208,7 @@ fun RegistroExamenScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Botón de Envío
+            // Botón de Envío / Guardado
             Button(
                 onClick = { viewModel.guardar() },
                 enabled = guardadoState !is GuardadoState.Guardando,
@@ -208,4 +227,19 @@ fun RegistroExamenScreen(
             }
         }
     }
+}
+
+/**
+ * Consulta el ContentResolver del sistema para obtener el nombre real y legible
+ * del archivo seleccionado mediante Storage Access Framework (SAF).
+ */
+private fun obtenerNombreArchivo(context: Context, uri: Uri): String {
+    var resultado = "documento_adjunto"
+    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (cursor.moveToFirst() && nameIndex != -1) {
+            resultado = cursor.getString(nameIndex)
+        }
+    }
+    return resultado
 }
