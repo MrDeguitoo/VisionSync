@@ -192,7 +192,7 @@ app/src/main/java/com/duoc/visionsyncc1/
 ### Pasos para Ejecutar
 1. Clonar el repositorio desde GitHub:
    ```bash
-   git clone <URL_DEL_REPOSITORIO>
+   git clone https://github.com/MrDeguitoo/VisionSync.git
    cd VisionSync
    ```
 2. Abrir la carpeta raíz en **Android Studio** (*File → Open*).
