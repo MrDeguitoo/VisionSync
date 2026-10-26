@@ -7,7 +7,6 @@
 <p align="center">
 <img src="docs/diseno/Logo_VisionSync.png" alt="Logo VisionSync" width="220"/>
 </p>
-
 ---
 
 ## 1. Descripción del Proyecto y Problema Clínico
