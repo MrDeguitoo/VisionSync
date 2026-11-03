@@ -11,6 +11,7 @@ fun CreationExtras.visionSyncApp(): VisionSyncApp =
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
+        initializer { DashTecnologoViewModel(visionSyncApp().repository) }
         initializer { RegistroExamenViewModel(visionSyncApp().repository) }
         initializer { ExamenesViewModel(visionSyncApp().repository) }
         initializer { PacienteViewModel(visionSyncApp().repository) }
