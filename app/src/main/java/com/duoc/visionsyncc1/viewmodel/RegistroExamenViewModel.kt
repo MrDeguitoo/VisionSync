@@ -5,14 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.duoc.visionsyncc1.model.ExamenEntity
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.util.rutValido
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 data class FormularioState(
     val nombre: String = "",
@@ -97,19 +97,22 @@ class RegistroExamenViewModel(
         viewModelScope.launch {
             _guardado.value = GuardadoState.Guardando
             try {
-                val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-                repository.guardar(
-                    ExamenEntity(
-                        pacienteNombre = actual.nombre.trim(),
-                        pacienteRut = actual.rut.trim(),
-                        tipoExamen = actual.tipoExamen,
-                        fecha = fecha,
-                        archivoUri = actual.archivoUri
-                    )
+                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+
+                val examen = ExamenEntity(
+                    pacienteNombre = actual.nombre.trim(),
+                    pacienteRut = actual.rut.trim(),
+                    tipoExamen = actual.tipoExamen,
+                    fecha = fechaActual,
+                    archivoUri = actual.archivoUri,
+                    observaciones = "",
+                    estado = "Pendiente"
                 )
+
+                repository.guardar(examen)
                 _guardado.value = GuardadoState.Exito
             } catch (e: Exception) {
-                _guardado.value = GuardadoState.Error("No se pudo guardar el examen")
+                _guardado.value = GuardadoState.Error(e.message ?: "Error al guardar examen")
             }
         }
     }

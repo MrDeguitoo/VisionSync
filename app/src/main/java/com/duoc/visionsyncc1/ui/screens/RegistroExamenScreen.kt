@@ -19,13 +19,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duoc.visionsyncc1.viewmodel.GuardadoState
 import com.duoc.visionsyncc1.viewmodel.RegistroExamenViewModel
+import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroExamenScreen(
     onVolver: () -> Unit,
     onGuardadoExitoso: () -> Unit,
-    viewModel: RegistroExamenViewModel = viewModel()
+    viewModel: RegistroExamenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
     val formState by viewModel.form.collectAsState()
@@ -146,7 +148,7 @@ fun RegistroExamenScreen(
                     isError = formState.tipoError != null,
                     supportingText = { formState.tipoError?.let { Text(it) } },
                     modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
