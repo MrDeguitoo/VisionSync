@@ -5,25 +5,51 @@ import androidx.lifecycle.viewModelScope
 import com.duoc.visionsyncc1.model.ExamenEntity
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-class ExamenesViewModel(private val repo: ExamenRepository) : ViewModel() {
+class ExamenesViewModel(
+    private val repository: ExamenRepository
+) : ViewModel() {
 
     private val _busqueda = MutableStateFlow("")
     val busqueda: StateFlow<String> = _busqueda.asStateFlow()
 
-    private val _filtroTipo = MutableStateFlow<String?>(null)
-    val filtroTipo: StateFlow<String?> = _filtroTipo.asStateFlow()
+    private val _tipoFiltro = MutableStateFlow<String?>(null)
+    val tipoFiltro: StateFlow<String?> = _tipoFiltro.asStateFlow()
 
-    val examenes: StateFlow<List<ExamenEntity>> =
-        combine(repo.observarTodos(), _busqueda, _filtroTipo) { lista, texto, tipo ->
-            lista.filter { e ->
-                (texto.isBlank() ||
-                        e.pacienteNombre.contains(texto, ignoreCase = true) ||
-                        e.pacienteRut.contains(texto)) &&
-                        (tipo == null || e.tipoExamen == tipo)
+    val examenesFiltrados: StateFlow<List<ExamenEntity>> =
+        combine(repository.observarTodos(), _busqueda, _tipoFiltro) { lista, query, tipo ->
+            lista.filter { examen ->
+                val coincideTexto = query.isEmpty() ||
+                    examen.pacienteNombre.contains(query, ignoreCase = true) ||
+                    examen.pacienteRut.contains(query, ignoreCase = true)
+
+                val coincideTipo = tipo == null || examen.tipoExamen.equals(tipo, ignoreCase = true)
+
+                coincideTexto && coincideTipo
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    fun onBusquedaChange(texto: String) { _busqueda.value = texto }
-    fun onFiltroChange(tipo: String?) { _filtroTipo.value = tipo }
+    fun onBusquedaCambiada(nuevaBusqueda: String) {
+        _busqueda.value = nuevaBusqueda
+    }
+
+    fun onTipoFiltroSeleccionado(tipo: String?) {
+        _tipoFiltro.value = if (_tipoFiltro.value == tipo) null else tipo
+    }
+
+    fun autorizarExamen(examen: ExamenEntity, observaciones: String, onExito: () -> Unit) {
+        viewModelScope.launch {
+            val examenActualizado = examen.copy(
+                estado = "Autorizado",
+                observaciones = observaciones.trim()
+            )
+            repository.actualizarObservaciones(examenActualizado.id, examenActualizado.observaciones, examenActualizado.estado)
+            onExito()
+        }
+    }
 }

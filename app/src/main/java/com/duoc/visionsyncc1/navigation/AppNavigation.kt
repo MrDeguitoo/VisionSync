@@ -61,9 +61,27 @@ fun AppNavigation(
             )
         }
 
-        // Marcador de posición temporal para B (evita errores de compilación)
+        // Flujo Médico - Dashboard (Buscador)
         composable(Rutas.DASH_MEDICO) {
-            /* Pantalla del Médico (la conectará B) */
+            BuscadorScreen(
+                onExamenSeleccionado = { id ->
+                    navController.navigate(Rutas.DETALLE.replace("{id}", id.toString()))
+                },
+                onVolver = { navController.popBackStack(Rutas.PERFIL, inclusive = false) }
+            )
+        }
+
+        // Flujo Médico - Detalle de examen
+        composable(
+            route = Rutas.DETALLE,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            DetalleExamenScreen(
+                examenId = id,
+                onVolver = { navController.popBackStack() },
+                onExamenAutorizado = { navController.popBackStack() }
+            )
         }
 
         // RF6: Portal del Paciente (Integrante C)
