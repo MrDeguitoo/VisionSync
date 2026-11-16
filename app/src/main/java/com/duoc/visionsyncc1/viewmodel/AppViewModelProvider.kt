@@ -21,6 +21,9 @@ object AppViewModelProvider {
         initializer {
             ExamenesViewModel(visionSyncApp().examenRepository)
         }
+        initializer {
+            RegistroExamenViewModel(visionSyncApp().examenRepository)
+        }
         // Aquí se agregan los ViewModels de A y B cuando usen Room.
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
 import com.duoc.visionsyncc1.viewmodel.GuardadoState
 import com.duoc.visionsyncc1.viewmodel.RegistroExamenViewModel
 
@@ -25,7 +26,7 @@ import com.duoc.visionsyncc1.viewmodel.RegistroExamenViewModel
 fun RegistroExamenScreen(
     onVolver: () -> Unit,
     onGuardadoExitoso: () -> Unit,
-    viewModel: RegistroExamenViewModel = viewModel()
+    viewModel: RegistroExamenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
     val formState by viewModel.form.collectAsState()
