@@ -5,10 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duoc.visionsyncc1.model.ExamenEntity
+import com.duoc.visionsyncc1.model.UserEntity
 
-@Database(entities = [ExamenEntity::class], version = 1, exportSchema = false)
+@Database(entities = [ExamenEntity::class, UserEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun examenDao(): ExamenDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile
@@ -20,7 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "visionsync.db"
-                ).build().also { INSTANCE = it }
+                ).fallbackToDestructiveMigration() // Para desarrollo, migración simple
+                    .build().also { INSTANCE = it }
             }
     }
 }
