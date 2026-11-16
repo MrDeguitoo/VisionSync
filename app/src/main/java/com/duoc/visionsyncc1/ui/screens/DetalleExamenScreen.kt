@@ -1,10 +1,15 @@
 package com.duoc.visionsyncc1.ui.screens
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -63,6 +68,14 @@ fun DetalleExamenScreen(
                 )
             } else {
                 val e = examen!!
+
+                // Launcher para ver el archivo adjunto
+                val viewFileLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    // No action needed on result
+                }
+
                 Column(
                     modifier = Modifier
                         .padding(20.dp)
@@ -88,7 +101,37 @@ fun DetalleExamenScreen(
                             InfoRow("Paciente", e.pacienteNombre)
                             InfoRow("RUT", e.pacienteRut)
                             InfoRow("Fecha", e.fecha)
-                            InfoRow("Archivo adjunto", e.archivoUri?.let { "Disponible" } ?: "Sin archivo")
+                            e.archivoUri?.let { uri ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Archivo adjunto:",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        text = "Disponible",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                    IconButton(onClick = {
+                                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                                            data = Uri.parse(uri)
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
+                                        viewFileLauncher.launch(intent)
+                                    }) {
+                                        Icon(Icons.Default.PictureAsPdf, contentDescription = "Ver archivo adjunto")
+                                    }
+                                }
+                            }
+                        } ?: InfoRow("Archivo adjunto", "Sin archivo")
                             InfoRow("Estado actual", e.estado)
                         }
                     }
