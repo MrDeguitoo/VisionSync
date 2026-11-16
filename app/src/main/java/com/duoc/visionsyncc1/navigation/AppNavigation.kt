@@ -3,9 +3,11 @@ package com.duoc.visionsyncc1.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.duoc.visionsyncc1.ui.screens.*
 
 @Composable
@@ -59,12 +61,31 @@ fun AppNavigation(
             )
         }
 
-        // Marcadores de posición temporales para B y C (evitan errores de compilación)
+        // Marcador de posición temporal para B (evita errores de compilación)
         composable(Rutas.DASH_MEDICO) {
             /* Pantalla del Médico (la conectará B) */
         }
+
+        // RF6: Portal del Paciente (Integrante C)
         composable(Rutas.DASH_PACIENTE) {
-            /* Pantalla del Paciente (la conectará C) */
+            DashPacienteScreen(
+                onVerResumen = { id ->
+                    navController.navigate(Rutas.RESUMEN.replace("{id}", id.toString()))
+                },
+                onCerrarSesion = { navController.popBackStack(Rutas.PERFIL, inclusive = false) }
+            )
+        }
+
+        // RF6: Resumen de un examen autorizado
+        composable(
+            route = Rutas.RESUMEN,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            ResumenExamenScreen(
+                examenId = id,
+                onVolver = { navController.popBackStack() }
+            )
         }
     }
 }
