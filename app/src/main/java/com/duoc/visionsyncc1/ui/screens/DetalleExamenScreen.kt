@@ -113,7 +113,8 @@ fun DetalleExamenScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
                                         text = "Disponible",
