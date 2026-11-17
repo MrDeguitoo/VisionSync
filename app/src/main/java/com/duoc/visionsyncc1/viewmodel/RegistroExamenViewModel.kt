@@ -2,12 +2,17 @@ package com.duoc.visionsyncc1.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duoc.visionsyncc1.model.ExamenEntity
+import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.util.rutValido
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 data class FormularioState(
@@ -28,7 +33,9 @@ sealed class GuardadoState {
     data class Error(val mensaje : String) : GuardadoState()
 }
 
-class RegistroExamenViewModel : ViewModel() {
+class RegistroExamenViewModel(
+    private val repository: ExamenRepository
+) : ViewModel() {
 
     private val _form = MutableStateFlow(FormularioState())
     val form: StateFlow<FormularioState> = _form.asStateFlow()
@@ -86,11 +93,23 @@ class RegistroExamenViewModel : ViewModel() {
             }
             return
         }
-        // Simulación temporal mientras B sube Room a main
+
+        // Generar fecha actual
+        val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+
+        // Guardar en Room
         viewModelScope.launch {
             _guardado.value = GuardadoState.Guardando
-            // TODO: Cuando B termine Room, aquí llamaremos a:
-            // repository.guardar(ExamenEntity(...))
+            val examen = ExamenEntity(
+                pacienteNombre = actual.nombre.trim(),
+                pacienteRut = actual.rut.trim(),
+                tipoExamen = actual.tipoExamen,
+                fecha = fecha,
+                archivoUri = actual.archivoUri,
+                observaciones = "",
+                estado = "Pendiente"
+            )
+            repository.guardar(examen)
             _guardado.value = GuardadoState.Exito
         }
     }
