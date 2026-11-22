@@ -13,3 +13,15 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.idea/
+build/
+
+# Secretos y firma
+*.jks
+*.keystore
+keystore.properties
+application-local.properties
+
+# Backend
+backend/data/
+backend/uploads/
