@@ -97,7 +97,7 @@ class RegistroExamenViewModel(
         // Generar fecha actual
         val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
-        // Guardar en Room
+        // Guardar en Room (offline-first)
         viewModelScope.launch {
             _guardado.value = GuardadoState.Guardando
             val examen = ExamenEntity(
@@ -109,8 +109,11 @@ class RegistroExamenViewModel(
                 observaciones = "",
                 estado = "Pendiente"
             )
-            repository.guardar(examen)
-            _guardado.value = GuardadoState.Exito
+            val result = repository.guardar(examen)
+            result.onSuccess { _guardado.value = GuardadoState.Exito }
+                .onFailure { e ->
+                    _guardado.value = GuardadoState.Error("Error al guardar: ${e.message}")
+                }
         }
     }
 

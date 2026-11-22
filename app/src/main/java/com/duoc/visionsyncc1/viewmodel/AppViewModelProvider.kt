@@ -25,7 +25,10 @@ object AppViewModelProvider {
             RegistroExamenViewModel(visionSyncApp().examenRepository)
         }
         initializer {
-            LoginViewModel(visionSyncApp().userRepository)
+            LoginViewModel(visionSyncApp().authRepository)
+        }
+        initializer {
+            FhirViewModel(visionSyncApp().fhirRepository)
         }
         // Aquí se agregan los ViewModels de A y B cuando usen Room.
     }
