@@ -215,7 +215,7 @@ fun RegistroExamenScreen(
                 enabled = guardadoState !is GuardadoState.Guardando,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .heightIn(min = 50.dp)
             ) {
                 if (guardadoState is GuardadoState.Guardando) {
                     CircularProgressIndicator(

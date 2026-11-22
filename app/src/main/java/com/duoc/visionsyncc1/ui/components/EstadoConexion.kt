@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.duoc.visionsyncc1.util.observarConexion
 
 /** Versión que se conecta sola al estado de red. Úsala en los dashboards. */
@@ -40,7 +39,7 @@ fun EstadoConexionPill(conectado: Boolean, modifier: Modifier = Modifier) {
         Spacer(Modifier.width(6.dp))
         Text(
             text = if (conectado) "Sincronizado" else "Sin conexión",
-            color = color, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
+            color = color, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold
         )
     }
 }

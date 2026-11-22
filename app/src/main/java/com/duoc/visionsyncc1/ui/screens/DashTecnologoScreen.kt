@@ -2,6 +2,8 @@ package com.duoc.visionsyncc1.ui.screens
 
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,7 +31,8 @@ fun DashTecnologoScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(20.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Tarjeta informativa institucional
@@ -61,7 +64,7 @@ fun DashTecnologoScreen(
                 onClick = onNuevoExamen,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp)
+                    .heightIn(min = 54.dp)
             ) {
                 Text("+ Registrar Nuevo Examen", style = MaterialTheme.typography.titleMedium)
             }

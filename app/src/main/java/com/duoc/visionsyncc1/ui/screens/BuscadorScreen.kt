@@ -123,7 +123,7 @@ private fun SearchBar(
         onValueChange = onValueChange,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .heightIn(min = 56.dp),
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         label = { Text(placeholder) },

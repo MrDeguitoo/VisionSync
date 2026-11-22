@@ -102,37 +102,37 @@ fun DetalleExamenScreen(
                             InfoRow("RUT", e.pacienteRut)
                             InfoRow("Fecha", e.fecha)
                             e.archivoUri?.let { uri ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Archivo adjunto:",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                                 Row(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "Disponible",
+                                        text = "Archivo adjunto:",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    IconButton(onClick = {
-                                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                                            data = Uri.parse(uri)
-                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Disponible",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                        IconButton(onClick = {
+                                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                                data = Uri.parse(uri)
+                                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            }
+                                            viewFileLauncher.launch(intent)
+                                        }) {
+                                            Icon(Icons.Default.PictureAsPdf, contentDescription = "Ver archivo adjunto")
                                         }
-                                        viewFileLauncher.launch(intent)
-                                    }) {
-                                        Icon(Icons.Default.PictureAsPdf, contentDescription = "Ver archivo adjunto")
                                     }
                                 }
-                            }
-                        } ?: InfoRow("Archivo adjunto", "Sin archivo")
+                            } ?: InfoRow("Archivo adjunto", "Sin archivo")
                             InfoRow("Estado actual", e.estado)
                         }
                     }
@@ -225,15 +225,19 @@ fun DetalleExamenScreen(
 private fun InfoRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             text = "$label:",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        // weight(1f): el valor usa el espacio restante y baja de línea
+        // en vez de aplastarse cuando la fuente está ampliada.
         Text(
             text = value,
+            modifier = Modifier.weight(1f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.End,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )

@@ -1,6 +1,8 @@
 package com.duoc.visionsyncc1.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -50,7 +52,8 @@ fun LoginScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(24.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -121,7 +124,7 @@ fun LoginScreen(
                 onClick = { viewModel.intentarLogin() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .heightIn(min = 50.dp),
                 enabled = !uiState.loginExitoso
             ) {
                 if (uiState.loginExitoso) {
@@ -140,7 +143,7 @@ fun LoginScreen(
             Text(
                 text = "Usuarios de prueba:\n• jduarte@gmail.com / 123456 (Tecnólogo)\n• mgarcia@gmail.com / 123456 (Médico)\n• pperez@gmail.com / 123456 (Paciente)",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }
