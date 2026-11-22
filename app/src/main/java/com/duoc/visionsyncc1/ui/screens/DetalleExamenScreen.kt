@@ -19,6 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duoc.visionsyncc1.model.ExamenEntity
@@ -43,7 +48,7 @@ fun DetalleExamenScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle del Examen") },
+                title = { Text("Detalle del Examen", modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -95,6 +100,7 @@ fun DetalleExamenScreen(
                         ) {
                             Text(
                                 text = e.tipoExamen,
+                                modifier = Modifier.semantics { heading() },
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Divider()
@@ -145,6 +151,7 @@ fun DetalleExamenScreen(
                         ) {
                             Text(
                                 text = "Observaciones Médicas",
+                                modifier = Modifier.semantics { heading() },
                                 style = MaterialTheme.typography.titleMedium
                             )
 
@@ -157,7 +164,11 @@ fun DetalleExamenScreen(
                                     }
                                 },
                                 label = { Text("Escribe tus observaciones...") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .semantics {
+                                        if (mostrarError) error("Las observaciones no pueden estar vacías.")
+                                    },
                                 minLines = 4,
                                 maxLines = 6,
                                 singleLine = false,
@@ -167,6 +178,7 @@ fun DetalleExamenScreen(
                             if (mostrarError) {
                                 Text(
                                     text = "Las observaciones no pueden estar vacías.",
+                                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -185,7 +197,6 @@ fun DetalleExamenScreen(
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !observaciones.trim().isEmpty(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
@@ -224,7 +235,9 @@ fun DetalleExamenScreen(
 @Composable
 private fun InfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) { },
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(

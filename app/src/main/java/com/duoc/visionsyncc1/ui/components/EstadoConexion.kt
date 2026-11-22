@@ -9,6 +9,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +36,16 @@ fun EstadoConexionPill(conectado: Boolean, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .background(color.copy(alpha = 0.12f), RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = if (conectado) {
+                    "Estado de conexión: sincronizado"
+                } else {
+                    "Estado de conexión: sin conexión, trabajando sin internet"
+                }
+                // Anuncia el cambio sin interrumpir lo que TalkBack está leyendo
+                liveRegion = LiveRegionMode.Polite
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(Modifier.size(8.dp).background(color, CircleShape))

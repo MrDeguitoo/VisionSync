@@ -7,6 +7,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -30,6 +35,8 @@ fun ConfirmacionScreen(
             // Emblema visual de éxito
             Text(
                 text = "✓",
+                // Decorativo: TalkBack ya leerá el título de éxito
+                modifier = Modifier.clearAndSetSemantics { },
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -38,6 +45,10 @@ fun ConfirmacionScreen(
 
             Text(
                 text = "¡Examen Registrado!",
+                modifier = Modifier.semantics {
+                    heading()
+                    liveRegion = LiveRegionMode.Polite
+                },
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center
             )

@@ -18,6 +18,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,7 +47,7 @@ fun BuscadorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Buscador de Exámenes") },
+                title = { Text("Buscador de Exámenes", modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -64,7 +70,7 @@ fun BuscadorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (busqueda.isNotBlank()) {
                         IconButton(onClick = { viewModel.onBusquedaCambiada("") }) {
@@ -150,7 +156,7 @@ private fun FilterChipsRow(
             selected = selectedTipo == null,
             onClick = { onTipoSeleccionado(null) },
             label = { Text("Todos") },
-            leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = "Filtro") }
+            leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) }
         )
 
         tipos.forEach { tipo ->
@@ -177,7 +183,12 @@ private fun ExamenCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .clearAndSetSemantics {
+                    contentDescription = "${examen.tipoExamen}. Paciente ${examen.pacienteNombre}. " +
+                            "RUT ${examen.pacienteRut}. Fecha ${examen.fecha}. Estado ${examen.estado}."
+                },
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
@@ -230,6 +241,7 @@ private fun EstadoVacioCard(message: String) {
             )
             Text(
                 text = message,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center

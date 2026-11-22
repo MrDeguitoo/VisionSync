@@ -14,6 +14,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,7 +82,7 @@ fun RegistroExamenScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Registrar Examen Oftalmológico") },
+                title = { Text("Registrar Examen Oftalmológico", modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(
@@ -98,6 +104,7 @@ fun RegistroExamenScreen(
         ) {
             Text(
                 text = "Datos del Paciente y Estudio",
+                modifier = Modifier.semantics { heading() },
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -110,7 +117,9 @@ fun RegistroExamenScreen(
                 placeholder = { Text("Ej. Juan Pérez González") },
                 isError = formState.nombreError != null,
                 supportingText = { formState.nombreError?.let { Text(it) } },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { formState.nombreError?.let { error(it) } }
             )
 
             // Campo RUT
@@ -121,7 +130,9 @@ fun RegistroExamenScreen(
                 placeholder = { Text("12.345.678-9") },
                 isError = formState.rutError != null,
                 supportingText = { formState.rutError?.let { Text(it) } },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { formState.rutError?.let { error(it) } }
             )
 
             // Selector Tipo de Examen (Material 3 Exposed Dropdown)
@@ -149,6 +160,7 @@ fun RegistroExamenScreen(
                     modifier = Modifier
                         .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
+                        .semantics { formState.tipoError?.let { error(it) } }
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -176,6 +188,7 @@ fun RegistroExamenScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Informe o Archivo Clínico *",
+                        modifier = Modifier.semantics { heading() },
                         style = MaterialTheme.typography.titleSmall
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -191,6 +204,7 @@ fun RegistroExamenScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Archivo seleccionado: ${nombreArchivoSeleccionado ?: "Archivo cargado"}",
+                            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -200,6 +214,7 @@ fun RegistroExamenScreen(
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = formState.archivoError!!,
+                            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -219,7 +234,9 @@ fun RegistroExamenScreen(
             ) {
                 if (guardadoState is GuardadoState.Guardando) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .semantics { contentDescription = "Guardando examen" },
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {

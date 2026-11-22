@@ -7,6 +7,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -18,9 +21,12 @@ fun DashTecnologoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Panel del Tecnólogo") },
+                title = { Text("Panel del Tecnólogo", modifier = Modifier.semantics { heading() }) },
                 actions = {
-                    TextButton(onClick = onCerrarSesion) {
+                    TextButton(
+                        onClick = onCerrarSesion,
+                        modifier = Modifier.semantics { contentDescription = "Salir de la sesión" }
+                    ) {
                         Text("Salir", color = MaterialTheme.colorScheme.error)
                     }
                 }
@@ -45,6 +51,7 @@ fun DashTecnologoScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Bienvenido/a",
+                        modifier = Modifier.semantics { heading() },
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -65,6 +72,7 @@ fun DashTecnologoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 54.dp)
+                    .semantics { contentDescription = "Registrar nuevo examen" }
             ) {
                 Text("+ Registrar Nuevo Examen", style = MaterialTheme.typography.titleMedium)
             }
@@ -76,6 +84,7 @@ fun DashTecnologoScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Actividad reciente",
+                        modifier = Modifier.semantics { heading() },
                         style = MaterialTheme.typography.titleSmall
                     )
                     Spacer(modifier = Modifier.height(6.dp))

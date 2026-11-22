@@ -12,6 +12,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duoc.visionsyncc1.ui.components.EstadoConexion
@@ -33,7 +38,7 @@ fun ResumenExamenScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Resumen del examen") },
+                title = { Text("Resumen del examen", modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -49,13 +54,18 @@ fun ResumenExamenScreen(
                 .fillMaxSize()
         ) {
             when {
-                cargando -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+                cargando -> CircularProgressIndicator(
+                    Modifier
+                        .align(Alignment.Center)
+                        .semantics { contentDescription = "Cargando examen" }
+                )
 
                 examen == null -> Text(
                     text = "Este examen no está disponible.",
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .padding(24.dp),
+                        .padding(24.dp)
+                        .semantics { liveRegion = LiveRegionMode.Polite },
                     style = MaterialTheme.typography.bodyLarge
                 )
 
@@ -77,7 +87,11 @@ fun ResumenExamenScreen(
                                 modifier = Modifier.padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Text(e.tipoExamen, style = MaterialTheme.typography.titleLarge)
+                                Text(
+                                    e.tipoExamen,
+                                    modifier = Modifier.semantics { heading() },
+                                    style = MaterialTheme.typography.titleLarge
+                                )
                                 Text("Paciente: ${e.pacienteNombre}")
                                 Text("RUT: ${e.pacienteRut}")
                                 Text("Fecha: ${e.fecha}")
@@ -92,6 +106,7 @@ fun ResumenExamenScreen(
                             ) {
                                 Text(
                                     "Observaciones del médico",
+                                    modifier = Modifier.semantics { heading() },
                                     style = MaterialTheme.typography.titleSmall
                                 )
                                 Text(
