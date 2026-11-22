@@ -16,7 +16,10 @@ object AppViewModelProvider {
             PacienteViewModel(visionSyncApp().examenRepository)
         }
         initializer {
-            ResumenExamenViewModel(visionSyncApp().examenRepository)
+            ResumenExamenViewModel(
+                visionSyncApp().examenRepository,
+                visionSyncApp().consultaRepository
+            )
         }
         initializer {
             ExamenesViewModel(visionSyncApp().examenRepository)
@@ -26,6 +29,13 @@ object AppViewModelProvider {
         }
         initializer {
             LoginViewModel(visionSyncApp().userRepository)
+        }
+        initializer {
+            AdminViewModel(
+                visionSyncApp().userRepository,
+                visionSyncApp().examenRepository,
+                visionSyncApp().consultaRepository
+            )
         }
         // Aquí se agregan los ViewModels de A y B cuando usen Room.
     }

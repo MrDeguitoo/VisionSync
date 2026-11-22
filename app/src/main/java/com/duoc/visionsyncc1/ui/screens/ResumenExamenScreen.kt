@@ -25,7 +25,7 @@ fun ResumenExamenScreen(
     onVolver: () -> Unit,
     viewModel: ResumenExamenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    LaunchedEffect(examenId) { viewModel.cargar(examenId) }
+    LaunchedEffect(examenId) { viewModel.cargar(examenId, 0, "Paciente", "PACIENTE") }
 
     val examen by viewModel.examen.collectAsState()
     val cargando by viewModel.cargando.collectAsState()
@@ -78,10 +78,16 @@ fun ResumenExamenScreen(
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 Text(e.tipoExamen, style = MaterialTheme.typography.titleLarge)
-                                Text("Paciente: ${e.pacienteNombre}")
-                                Text("RUT: ${e.pacienteRut}")
-                                Text("Fecha: ${e.fecha}")
-                                Text("Estado: ${e.estado}")
+                                InfoRow("Paciente", e.pacienteNombre)
+                                InfoRow("RUT", e.pacienteRut)
+                                InfoRow("Ojo Evaluado", e.ojoEvaluado)
+                                InfoRow("Sucursal", e.sucursal)
+                                InfoRow("Profesional Responsable", e.profesionalNombre.ifBlank { "No asignado" })
+                                InfoRow("Fecha", e.fecha)
+                                e.fechaEntrega?.let {
+                                    InfoRow("Fecha Entrega", it)
+                                }
+                                InfoRow("Estado", e.estado)
                             }
                         }
 
@@ -100,9 +106,46 @@ fun ResumenExamenScreen(
                                 )
                             }
                         }
+
+                        e.comentariosRevision?.takeIf { it.isNotBlank() }?.let { comentarios ->
+                            OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Text(
+                                        "Comentarios de Revisión",
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
+                                    Text(
+                                        text = comentarios,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "$label:",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }

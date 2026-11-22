@@ -12,4 +12,11 @@ object Rutas {
     const val DASH_PACIENTE = "dash_paciente"
     const val RESUMEN = "resumen/{id}"
 
+    // Admin routes
+    const val ADMIN_DASHBOARD = "admin_dashboard"
+    const val ADMIN_USUARIOS = "admin_usuarios"
+    const val ADMIN_CATALOGO = "admin_catalogo"
+    const val ADMIN_DATOS_PRUEBA = "admin_datos_prueba"
+    const val ADMIN_AUDITORIA = "admin_auditoria"
+
 }

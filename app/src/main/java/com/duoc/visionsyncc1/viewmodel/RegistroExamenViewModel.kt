@@ -20,10 +20,14 @@ data class FormularioState(
     val rut: String = "",
     val tipoExamen: String = "",
     val archivoUri: String? = null,
+    val ojoEvaluado: String = "Ambos",
+    val sucursal: String = "",
     val nombreError: String? = null,
     val rutError: String? = null,
     val tipoError: String? = null,
-    val archivoError: String? = null
+    val archivoError: String? = null,
+    val ojoError: String? = null,
+    val sucursalError: String? = null
 )
 
 sealed class GuardadoState {
@@ -59,7 +63,15 @@ class RegistroExamenViewModel(
         _form.update { it.copy(archivoUri = uri, archivoError = null) }
     }
 
-    fun guardar() {
+    fun onOjoChange(valor: String) {
+        _form.update { it.copy(ojoEvaluado = valor, ojoError = null) }
+    }
+
+    fun onSucursalChange(valor: String) {
+        _form.update { it.copy(sucursal = valor, sucursalError = null) }
+    }
+
+    fun guardar(profesionalId: Int = 0, profesionalNombre: String = "") {
         val actual = _form.value
         var valido = true
         val nombreError = if (actual.nombre.trim().length < 3) {
@@ -82,13 +94,25 @@ class RegistroExamenViewModel(
             "Debe adjuntar un archivo (PDF o Imagen)"
         } else null
 
+        val ojoError = if (actual.ojoEvaluado.isBlank()) {
+            valido = false
+            "Debe seleccionar un ojo a evaluar"
+        } else null
+
+        val sucursalError = if (actual.sucursal.isBlank()) {
+            valido = false
+            "Debe seleccionar una sucursal"
+        } else null
+
         if (!valido) {
             _form.update {
                 it.copy(
                     nombreError = nombreError,
                     rutError = rutError,
                     tipoError = tipoError,
-                    archivoError = archivoError
+                    archivoError = archivoError,
+                    ojoError = ojoError,
+                    sucursalError = sucursalError
                 )
             }
             return
@@ -107,7 +131,14 @@ class RegistroExamenViewModel(
                 fecha = fecha,
                 archivoUri = actual.archivoUri,
                 observaciones = "",
-                estado = "Pendiente"
+                estado = "Pendiente",
+                ojoEvaluado = actual.ojoEvaluado,
+                sucursal = actual.sucursal,
+                profesionalId = profesionalId,
+                profesionalNombre = profesionalNombre,
+                comentariosRevision = "",
+                fechaEntrega = null,
+                fechaActualizacion = null
             )
             repository.guardar(examen)
             _guardado.value = GuardadoState.Exito

@@ -12,9 +12,9 @@ class PacienteViewModel(
     repository: ExamenRepository
 ) : ViewModel() {
 
-    // Regla de negocio: la consulta SQL en el DAO filtra sólo 'Autorizado'
-    val examenesAutorizados: StateFlow<List<ExamenEntity>> =
-        repository.observarAutorizados().stateIn(
+    // Regla de negocio: el paciente solo ve exámenes en estado 'Entregado'
+    val examenesEntregados: StateFlow<List<ExamenEntity>> =
+        repository.observarPorEstado("Entregado").stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()

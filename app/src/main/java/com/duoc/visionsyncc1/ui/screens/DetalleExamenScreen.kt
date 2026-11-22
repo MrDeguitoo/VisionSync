@@ -101,6 +101,15 @@ fun DetalleExamenScreen(
                             InfoRow("Paciente", e.pacienteNombre)
                             InfoRow("RUT", e.pacienteRut)
                             InfoRow("Fecha", e.fecha)
+                            InfoRow("Ojo Evaluado", e.ojoEvaluado)
+                            InfoRow("Sucursal", e.sucursal)
+                            InfoRow("Profesional Responsable", e.profesionalNombre.ifBlank { "No asignado" })
+                            e.fechaEntrega?.let {
+                                InfoRow("Fecha Entrega", it)
+                            }
+                            e.comentariosRevision?.takeIf { it.isNotBlank() }?.let {
+                                InfoRow("Comentarios de Revisión", it)
+                            }
                             e.archivoUri?.let { uri ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -174,47 +183,43 @@ fun DetalleExamenScreen(
                         }
                     }
 
-                    // Botón Autorizar
-                    if (e.estado != "Autorizado") {
-                        Button(
-                            onClick = {
-                                if (observaciones.trim().isEmpty()) {
-                                    mostrarError = true
-                                } else {
-                                    viewModel.autorizarExamen(e, observaciones, onExamenAutorizado)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !observaciones.trim().isEmpty(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-                            )
-                        ) {
-                            Text("Autorizar Examen", style = MaterialTheme.typography.titleMedium)
-                        }
-                    } else {
-                        OutlinedCard(modifier = Modifier.fillMaxWidth()) {
-                            Column(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    text = "Examen ya autorizado",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.tertiary
-                                )
-                                Text(
-                                    text = "Observaciones registradas: ${e.observaciones}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                    // Botones de acción basados en estado y rol
+                    // Nota: El rol del usuario actual debería venir de la navegación o un ViewModel compartido
+                    // Por ahora, mostramos los botones según el estado del examen
+                    AccionesEstadoExamen(
+                        examen = e,
+                        observaciones = observaciones,
+                        onObservacionesChange = { observaciones = it },
+                        onValidar = {
+                            if (observaciones.trim().isEmpty()) {
+                                mostrarError = true
+                            } else {
+                                // profesionalId y profesionalNombre deberían venir del usuario logueado
+                                viewModel.validarExamen(e, profesionalId = 0, profesionalNombre = "", onExamenAutorizado)
+                            }
+                        },
+                        onEntregar = {
+                            if (observaciones.trim().isEmpty()) {
+                                mostrarError = true
+                            } else {
+                                viewModel.entregarExamen(e, observaciones, onExamenAutorizado)
+                            }
+                        },
+                        onObservar = {
+                            if (observaciones.trim().isEmpty()) {
+                                mostrarError = true
+                            } else {
+                                viewModel.observarExamen(e, observaciones, onExamenAutorizado)
+                            }
+                        },
+                        onActualizar = {
+                            if (observaciones.trim().isEmpty()) {
+                                mostrarError = true
+                            } else {
+                                viewModel.actualizarExamen(e, observaciones, onExamenAutorizado)
                             }
                         }
-                    }
+                    )
                 }
             }
         }
@@ -237,5 +242,131 @@ private fun InfoRow(label: String, value: String) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AccionesEstadoExamen(
+    examen: ExamenEntity,
+    observaciones: String,
+    onObservacionesChange: (String) -> Unit,
+    onValidar: () -> Unit,
+    onEntregar: () -> Unit,
+    onObservar: () -> Unit,
+    onActualizar: () -> Unit
+) {
+    val estado = examen.estado
+
+    // Determina qué botones mostrar según el estado del examen
+    // En una implementación completa, el rol del usuario vendría de la autenticación
+    when (estado) {
+        "Pendiente" -> {
+            // Tecnólogo: Puede Validar
+            Button(
+                onClick = onValidar,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = observaciones.trim().isNotEmpty(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                )
+            ) {
+                Text("Validar Examen (Tecnólogo)", style = MaterialTheme.typography.titleMedium)
+            }
+        }
+        "Validado" -> {
+            // Médico: Puede Entregar u Observar
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = onEntregar,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = observaciones.trim().isNotEmpty(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                    )
+                ) {
+                    Text("Entregar Examen (Médico)", style = MaterialTheme.typography.titleMedium)
+                }
+                OutlinedButton(
+                    onClick = onObservar,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = observaciones.trim().isNotEmpty()
+                ) {
+                    Text("Observar Examen (Médico)", style = MaterialTheme.typography.titleMedium)
+                }
+            }
+        }
+        "Observado" -> {
+            // Tecnólogo/Médico: Puede Actualizar
+            Button(
+                onClick = onActualizar,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = observaciones.trim().isNotEmpty(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                )
+            ) {
+                Text("Actualizar Examen (Tecnólogo/Médico)", style = MaterialTheme.typography.titleMedium)
+            }
+        }
+        "Entregado", "Actualizado" -> {
+            // Solo lectura - examen finalizado
+            OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = if (estado == "Entregado") "Examen entregado" else "Examen actualizado",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                    Text(
+                        text = "Observaciones registradas: ${examen.observaciones}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (examen.comentariosRevision.isNotBlank()) {
+                        Text(
+                            text = "Comentarios de revisión: ${examen.comentariosRevision}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+        else -> {
+            // Estados legacy o desconocidos
+            OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Estado: $estado",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Observaciones registradas: ${examen.observaciones}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
     }
 }

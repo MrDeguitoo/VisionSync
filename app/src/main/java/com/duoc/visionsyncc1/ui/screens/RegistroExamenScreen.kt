@@ -125,7 +125,7 @@ fun RegistroExamenScreen(
             )
 
             // Selector Tipo de Examen (Material 3 Exposed Dropdown)
-            var expanded by remember { mutableStateOf(false) }
+            var expandedTipo by remember { mutableStateOf(false) }
             val tiposExamen = listOf(
                 "Campimetría Computarizada",
                 "Topografía Corneal",
@@ -135,15 +135,15 @@ fun RegistroExamenScreen(
             )
 
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it }
+                expanded = expandedTipo,
+                onExpandedChange = { expandedTipo = it }
             ) {
                 OutlinedTextField(
                     value = formState.tipoExamen,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Tipo de Examen *") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTipo) },
                     isError = formState.tipoError != null,
                     supportingText = { formState.tipoError?.let { Text(it) } },
                     modifier = Modifier
@@ -151,20 +151,67 @@ fun RegistroExamenScreen(
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    expanded = expandedTipo,
+                    onDismissRequest = { expandedTipo = false }
                 ) {
                     tiposExamen.forEach { tipo ->
                         DropdownMenuItem(
                             text = { Text(tipo) },
                             onClick = {
                                 viewModel.onTipoChange(tipo)
-                                expanded = false
+                                expandedTipo = false
                             }
                         )
                     }
                 }
             }
+
+            // Selector Ojo Evaluado (Material 3 Exposed Dropdown)
+            var expandedOjo by remember { mutableStateOf(false) }
+            val opcionesOjo = listOf("Izquierdo", "Derecho", "Ambos")
+
+            ExposedDropdownMenuBox(
+                expanded = expandedOjo,
+                onExpandedChange = { expandedOjo = it }
+            ) {
+                OutlinedTextField(
+                    value = formState.ojoEvaluado,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Ojo Evaluado *") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedOjo) },
+                    isError = formState.ojoError != null,
+                    supportingText = { formState.ojoError?.let { Text(it) } },
+                    modifier = Modifier
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        .fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedOjo,
+                    onDismissRequest = { expandedOjo = false }
+                ) {
+                    opcionesOjo.forEach { ojo ->
+                        DropdownMenuItem(
+                            text = { Text(ojo) },
+                            onClick = {
+                                viewModel.onOjoChange(ojo)
+                                expandedOjo = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Campo Sucursal
+            OutlinedTextField(
+                value = formState.sucursal,
+                onValueChange = { viewModel.onSucursalChange(it) },
+                label = { Text("Sucursal *") },
+                placeholder = { Text("Ej. Sede Central") },
+                isError = formState.sucursalError != null,
+                supportingText = { formState.sucursalError?.let { Text(it) } },
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // Tarjeta de Selector de Archivo Nativo (SAF)
             OutlinedCard(
@@ -210,8 +257,10 @@ fun RegistroExamenScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Botón de Envío / Guardado
+            // Los campos profesionalId y profesionalNombre se obtienen del usuario logueado
+            // Por ahora se pasan valores por defecto (0 y "") - se conectarán cuando se integre autenticación
             Button(
-                onClick = { viewModel.guardar() },
+                onClick = { viewModel.guardar(profesionalId = 0, profesionalNombre = "") },
                 enabled = guardadoState !is GuardadoState.Guardando,
                 modifier = Modifier
                     .fillMaxWidth()

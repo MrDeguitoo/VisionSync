@@ -10,6 +10,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.duoc.visionsyncc1.model.UserEntity
 import com.duoc.visionsyncc1.ui.screens.*
+import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun AppNavigation(
@@ -33,6 +35,9 @@ fun AppNavigation(
                             popUpTo(Rutas.LOGIN) { inclusive = true }
                         }
                         "PACIENTE" -> navController.navigate(Rutas.DASH_PACIENTE) {
+                            popUpTo(Rutas.LOGIN) { inclusive = true }
+                        }
+                        "ADMINISTRADOR" -> navController.navigate(Rutas.ADMIN_DASHBOARD) {
                             popUpTo(Rutas.LOGIN) { inclusive = true }
                         }
                         else -> navController.navigate(Rutas.LOGIN)
@@ -107,6 +112,45 @@ fun AppNavigation(
             val id = backStackEntry.arguments?.getInt("id") ?: -1
             ResumenExamenScreen(
                 examenId = id,
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        // Admin Dashboard
+        composable(Rutas.ADMIN_DASHBOARD) {
+            AdminDashboardScreen(
+                onGestionUsuarios = { navController.navigate(Rutas.ADMIN_USUARIOS) },
+                onCatalogo = { navController.navigate(Rutas.ADMIN_CATALOGO) },
+                onDatosPrueba = { navController.navigate(Rutas.ADMIN_DATOS_PRUEBA) },
+                onAuditoria = { navController.navigate(Rutas.ADMIN_AUDITORIA) },
+                onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } }
+            )
+        }
+
+        // Admin - Gestión de Usuarios
+        composable(Rutas.ADMIN_USUARIOS) {
+            AdminUsuariosScreen(
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        // Admin - Catálogo de Exámenes
+        composable(Rutas.ADMIN_CATALOGO) {
+            AdminCatalogoScreen(
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        // Admin - Generar Datos de Prueba
+        composable(Rutas.ADMIN_DATOS_PRUEBA) {
+            AdminDatosPruebaScreen(
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        // Admin - Auditoría de Consultas
+        composable(Rutas.ADMIN_AUDITORIA) {
+            AdminAuditoriaScreen(
                 onVolver = { navController.popBackStack() }
             )
         }

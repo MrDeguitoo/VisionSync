@@ -3,6 +3,7 @@ package com.duoc.visionsyncc1
 import android.app.Application
 import com.duoc.visionsyncc1.data.AppDatabase
 import com.duoc.visionsyncc1.model.UserEntity
+import com.duoc.visionsyncc1.repository.ConsultaRepository
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,10 @@ class VisionSyncApp : Application() {
 
     val userRepository: UserRepository by lazy {
         UserRepository(database.userDao())
+    }
+
+    val consultaRepository: ConsultaRepository by lazy {
+        ConsultaRepository(database.consultaDao())
     }
 
     override fun onCreate() {
@@ -56,6 +61,12 @@ class VisionSyncApp : Application() {
                     passwordHash = passwordHash,
                     nombre = "Pedro Pérez",
                     rol = "PACIENTE"
+                ),
+                UserEntity(
+                    email = "aadmin@gmail.com",
+                    passwordHash = passwordHash,
+                    nombre = "Admin User",
+                    rol = "ADMINISTRADOR"
                 )
             )
 

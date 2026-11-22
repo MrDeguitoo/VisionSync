@@ -12,5 +12,12 @@ data class ExamenEntity(
     val fecha: String,
     val archivoUri: String?,
     val observaciones: String = "",
-    val estado: String = "Pendiente" // Pendiente / Revisado / Autorizado
+    val estado: String = "Pendiente", // Pendiente / Validado / Entregado / Observado / Actualizado
+    val ojoEvaluado: String = "Ambos",
+    val sucursal: String = "",
+    val profesionalId: Int = 0,
+    val profesionalNombre: String = "",
+    val comentariosRevision: String = "",
+    val fechaEntrega: String? = null,
+    val fechaActualizacion: String? = null
 )

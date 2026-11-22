@@ -21,4 +21,26 @@ interface ExamenDao {
 
     @Query("UPDATE examenes SET observaciones = :texto, estado = :estado WHERE id = :id")
     suspend fun actualizar(id: Int, texto: String, estado: String)
+
+    // Nuevas consultas
+    @Query("SELECT * FROM examenes WHERE sucursal = :sucursal ORDER BY id DESC")
+    fun observarPorSucursal(sucursal: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT * FROM examenes WHERE estado = :estado ORDER BY id DESC")
+    fun observarPorEstado(estado: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT * FROM examenes WHERE fecha BETWEEN :fechaInicio AND :fechaFin ORDER BY id DESC")
+    fun observarPorFechaRango(fechaInicio: String, fechaFin: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT * FROM examenes WHERE profesionalId = :profesionalId ORDER BY id DESC")
+    fun observarPorProfesional(profesionalId: Int): Flow<List<ExamenEntity>>
+
+    @Query("UPDATE examenes SET estado = :estado, comentariosRevision = :comentariosRevision, fechaEntrega = :fechaEntrega, fechaActualizacion = :fechaActualizacion WHERE id = :id")
+    suspend fun actualizarEstadoCompleto(
+        id: Int,
+        estado: String,
+        comentariosRevision: String,
+        fechaEntrega: String,
+        fechaActualizacion: String
+    )
 }
