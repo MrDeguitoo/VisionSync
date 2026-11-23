@@ -234,6 +234,34 @@ class ExamenRepository(
         throw IllegalStateException("Documento no disponible offline")
     }
 
+    // ===== Métodos Admin =====
+
+    suspend fun contarTotal(): Int = dao.contarTotal()
+
+    suspend fun contarPendientesEstado(): Int = dao.contarPendientesEstado()
+
+    suspend fun contarRevisados(): Int = dao.contarRevisados()
+
+    suspend fun contarAutorizados(): Int = dao.contarAutorizados()
+
+    suspend fun contarObservados(): Int = dao.contarObservados()
+
+    fun obtenerSucursales(): Flow<List<String>> = dao.obtenerSucursales().distinctUntilChanged()
+
+    fun obtenerProfesionales(): Flow<List<String>> = dao.obtenerProfesionales().distinctUntilChanged()
+
+    suspend fun validarExamen(id: Int, nuevoEstado: String, nuevoEstadoExt: String, fecha: String, comentario: String) {
+        dao.validarExamen(id, nuevoEstado, nuevoEstadoExt, fecha, comentario)
+    }
+
+    suspend fun entregarExamen(id: Int, comentario: String) {
+        dao.entregarExamen(id, comentario)
+    }
+
+    suspend fun observarExamen(id: Int, nuevoEstado: String, nuevoEstadoExt: String, comentario: String) {
+        dao.observarExamen(id, nuevoEstado, nuevoEstadoExt, comentario)
+    }
+
     private fun downloadToFile(responseBody: ResponseBody, context: android.content.Context, tipoExamen: String): File {
         val dir = File(context.filesDir, "documentos")
         if (!dir.exists()) dir.mkdirs()

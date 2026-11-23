@@ -13,6 +13,14 @@ class UserRepository(private val dao: UserDao) {
 
     suspend fun eliminarTodos() = dao.eliminarTodos()
 
+    suspend fun contarUsuarios(): Int = dao.contarUsuarios()
+
+    suspend fun obtenerTodos(): List<UserEntity> = dao.obtenerTodos()
+
+    suspend fun actualizar(user: UserEntity) = dao.actualizar(user)
+
+    suspend fun eliminar(id: Int) = dao.eliminar(id)
+
     // Función auxiliar para verificar contraseña (en producción usar bcrypt/argon2)
     fun verificarContrasena(input: String, hash: String): Boolean {
         // Para demo: comparación simple. En producción: BCrypt.checkpw(input, hash)
