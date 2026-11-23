@@ -1,0 +1,39 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application config
+application-local.properties
+application-*.properties
+!application.properties
+
+# Data & uploads
+data/
+uploads/
+*.jks
+keystore.properties
+
+# Logs
+*.log
+logs/
+
+# Test reports
+target/surefire-reports/
+target/site/
