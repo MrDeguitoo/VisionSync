@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kover)
 }
 
 android {
@@ -81,6 +82,9 @@ dependencies {
     // PdfRenderer (android.graphics.pdf.PdfRenderer) viene en el SDK de Android, no requiere dependencia extra
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockwebserver)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -90,9 +94,22 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+}
 
-    // Tests
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockwebserver)
+kover {
+    reports {
+        filters {
+            includes {
+                packages(
+                    "com.duoc.visionsyncc1.viewmodel",
+                    "com.duoc.visionsyncc1.repository"
+                )
+            }
+        }
+        verify {
+            rule {
+                minBound(90)
+            }
+        }
+    }
 }

@@ -11,7 +11,6 @@ kotlin = "2.2.10"
 composeBom = "2026.02.01"
 ksp = "2.3.12"
 room = "2.8.5"
-<<<<<<< HEAD
 # Retrofit & OkHttp
 retrofit = "2.11.0"
 okhttp = "4.12.0"
@@ -21,13 +20,15 @@ coroutines = "1.10.2"
 # Serialization (alternativa a Gson)
 kotlinxSerialization = "1.8.0"
 # Tests
-mockk = "1.14.1"
+mockk = "1.14.12"
 mockwebserver = "4.12.0"
-coroutinesTest = "1.10.2"
+coroutinesTest = "1.11.0"
 # Coil 3 para carga de imágenes
 coil = "3.2.0"
 # Telephoto para zoom en imágenes (compatible con Coil 3)
 telephoto = "0.19.0"
+# Kover para coverage
+kover = "0.9.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,6 +52,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Retrofit & OkHttp
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
@@ -73,5 +75,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
-
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

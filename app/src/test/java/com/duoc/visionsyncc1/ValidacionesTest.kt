@@ -26,6 +26,6 @@ class ValidacionesTest {
     fun rutValido_textosInvalidos_retornaFalse() {
         assertFalse(rutValido(""))
         assertFalse(rutValido("abc"))
-        assertFalse(rutValido("1-9"))
+        assertFalse(rutValido("1"))
     }
 }
