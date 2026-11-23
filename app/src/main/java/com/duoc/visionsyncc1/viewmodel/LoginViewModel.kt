@@ -24,6 +24,8 @@ class LoginViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+    private val emailRegex = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
@@ -46,7 +48,7 @@ class LoginViewModel(
         val errorEmail = if (estadoActual.email.isBlank()) {
             hayError = true
             "El email es obligatorio"
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(estadoActual.email).matches()) {
+        } else if (!emailRegex.matches(estadoActual.email)) {
             hayError = true
             "Formato de email inválido"
         } else null
