@@ -3,9 +3,12 @@ package com.duoc.visionsyncc1.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.duoc.visionsyncc1.model.UserEntity
 import com.duoc.visionsyncc1.ui.screens.*
 
 @Composable
@@ -15,23 +18,27 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Rutas.PERFIL,
+        startDestination = Rutas.LOGIN,
         modifier = modifier
     ) {
-        // RF1: Pantalla inicial de selección de perfil
-        composable(Rutas.PERFIL) {
-            PerfilScreen(
-                onPerfilTecnologo = { navController.navigate(Rutas.LOGIN) },
-                onPerfilMedico = { navController.navigate(Rutas.DASH_MEDICO) },
-                onPerfilPaciente = { navController.navigate(Rutas.DASH_PACIENTE) }
-            )
-        }
-
-        // RF1: Flujo Tecnólogo - Login
+        // Login - Pantalla inicial
         composable(Rutas.LOGIN) {
             LoginScreen(
-                onLoginExitoso = { navController.navigate(Rutas.DASH_TECNOLOGO) },
-                onVolver = { navController.popBackStack() }
+                onLoginExitoso = { user: UserEntity ->
+                    when (user.rol) {
+                        "TECNOLOGO" -> navController.navigate(Rutas.DASH_TECNOLOGO) {
+                            popUpTo(Rutas.LOGIN) { inclusive = true }
+                        }
+                        "MEDICO" -> navController.navigate(Rutas.DASH_MEDICO) {
+                            popUpTo(Rutas.LOGIN) { inclusive = true }
+                        }
+                        "PACIENTE" -> navController.navigate(Rutas.DASH_PACIENTE) {
+                            popUpTo(Rutas.LOGIN) { inclusive = true }
+                        }
+                        else -> navController.navigate(Rutas.LOGIN)
+                    }
+                },
+                onVolver = { /* No hay vuelta atrás desde login inicial */ }
             )
         }
 
@@ -39,7 +46,7 @@ fun AppNavigation(
         composable(Rutas.DASH_TECNOLOGO) {
             DashTecnologoScreen(
                 onNuevoExamen = { navController.navigate(Rutas.REGISTRO_EXAMEN) },
-                onCerrarSesion = { navController.popBackStack(Rutas.PERFIL, inclusive = false) }
+                onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } }
             )
         }
 
@@ -59,12 +66,49 @@ fun AppNavigation(
             )
         }
 
-        // Marcadores de posición temporales para B y C (evitan errores de compilación)
+        // Flujo Médico - Dashboard (Buscador)
         composable(Rutas.DASH_MEDICO) {
-            /* Pantalla del Médico (la conectará B) */
+            BuscadorScreen(
+                onExamenSeleccionado = { id ->
+                    navController.navigate(Rutas.DETALLE.replace("{id}", id.toString()))
+                },
+                onVolver = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } }
+            )
         }
+
+        // Flujo Médico - Detalle de examen
+        composable(
+            route = Rutas.DETALLE,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            DetalleExamenScreen(
+                examenId = id,
+                onVolver = { navController.popBackStack() },
+                onExamenAutorizado = { navController.popBackStack() }
+            )
+        }
+
+        // RF6: Portal del Paciente (Integrante C)
         composable(Rutas.DASH_PACIENTE) {
-            /* Pantalla del Paciente (la conectará C) */
+            DashPacienteScreen(
+                onVerResumen = { id ->
+                    navController.navigate(Rutas.RESUMEN.replace("{id}", id.toString()))
+                },
+                onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } }
+            )
+        }
+
+        // RF6: Resumen de un examen autorizado
+        composable(
+            route = Rutas.RESUMEN,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            ResumenExamenScreen(
+                examenId = id,
+                onVolver = { navController.popBackStack() }
+            )
         }
     }
 }

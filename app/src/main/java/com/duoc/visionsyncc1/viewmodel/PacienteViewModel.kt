@@ -6,18 +6,17 @@ import com.duoc.visionsyncc1.model.ExamenEntity
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn
 
 class PacienteViewModel(
     private val repository: ExamenRepository
 ) : ViewModel() {
 
+    // Regla de negocio: la consulta SQL en el DAO filtra sólo 'Autorizado'
     val examenesAutorizados: StateFlow<List<ExamenEntity>> =
-        repository.observarAutorizados()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
+        repository.observarAutorizados().stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 }

@@ -6,14 +6,33 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.duoc.visionsyncc1.VisionSyncApp
 
-fun CreationExtras.visionSyncApp(): VisionSyncApp =
-    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as VisionSyncApp
-
+/**
+ * Fábrica centralizada de ViewModels que necesitan repositorios.
+ * Uso en una pantalla:  viewModel(factory = AppViewModelProvider.Factory)
+ */
 object AppViewModelProvider {
     val Factory = viewModelFactory {
-        initializer { DashTecnologoViewModel(visionSyncApp().repository) }
-        initializer { RegistroExamenViewModel(visionSyncApp().repository) }
-        initializer { ExamenesViewModel(visionSyncApp().repository) }
-        initializer { PacienteViewModel(visionSyncApp().repository) }
+        initializer {
+            PacienteViewModel(visionSyncApp().examenRepository)
+        }
+        initializer {
+            ResumenExamenViewModel(visionSyncApp().examenRepository)
+        }
+        initializer {
+            ExamenesViewModel(visionSyncApp().examenRepository)
+        }
+        initializer {
+            RegistroExamenViewModel(visionSyncApp().examenRepository)
+        }
+        initializer {
+            LoginViewModel(visionSyncApp().userRepository)
+        }
+        initializer {
+            DashTecnologoViewModel(visionSyncApp().examenRepository)
+        }
+        // Aquí se agregan los ViewModels de A y B cuando usen Room.
     }
 }
+
+fun CreationExtras.visionSyncApp(): VisionSyncApp =
+    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as VisionSyncApp

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
 import com.duoc.visionsyncc1.viewmodel.GuardadoState
 import com.duoc.visionsyncc1.viewmodel.RegistroExamenViewModel
 import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
