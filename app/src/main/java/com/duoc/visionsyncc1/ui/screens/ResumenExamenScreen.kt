@@ -36,7 +36,7 @@ fun ResumenExamenScreen(
     onVolver: () -> Unit,
     viewModel: ResumenExamenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    LaunchedEffect(examenId) { viewModel.cargar(examenId) }
+    LaunchedEffect(examenId) { viewModel.cargar(examenId, 0, "Paciente", "PACIENTE") }
 
     val examen by viewModel.examen.collectAsState()
     val cargando by viewModel.cargando.collectAsState()
@@ -94,45 +94,17 @@ fun ResumenExamenScreen(
                                 modifier = Modifier.padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Text(
-                                    e.tipoExamen,
-                                    modifier = Modifier.semantics { heading() },
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                                Text("Paciente: ${e.pacienteNombre}")
-                                Text("RUT: ${e.pacienteRut}")
-                                Text("Fecha: ${e.fecha}")
-                                Text("Estado: ${e.estado}")
-                                e.archivoUri?.let { uri ->
-                                    val esPdf = uri.lowercase().endsWith(".pdf")
-                                    val esImagen = uri.lowercase().matches(Regex(".*\\.(jpg|jpeg|png|bmp|webp)$"))
-                                    val descripcion = e.descripcionAccesible.ifBlank { "${e.tipoExamen}, ${if (esPdf) "informe PDF" else "imagen médica"}" }
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 8.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Archivo adjunto:",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        IconButton(
-                                            onClick = {
-                                                val ruta = if (esPdf) Rutas.VISOR_PDF else Rutas.VISOR_IMAGEN
-                                                navController.navigate("$ruta?archivoUri=${Uri.encode(uri)}&descripcion=${Uri.encode(descripcion)}")
-                                            },
-                                            modifier = Modifier.semantics { contentDescription = if (esPdf) "Ver informe PDF" else "Ver imagen médica" }
-                                        ) {
-                                            Icon(
-                                                imageVector = if (esPdf) Icons.Default.PictureAsPdf else Icons.Default.Image,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    }
+                                Text(e.tipoExamen, style = MaterialTheme.typography.titleLarge)
+                                InfoRow("Paciente", e.pacienteNombre)
+                                InfoRow("RUT", e.pacienteRut)
+                                InfoRow("Ojo Evaluado", e.ojoEvaluado)
+                                InfoRow("Sucursal", e.sucursal)
+                                InfoRow("Profesional Responsable", e.profesionalNombre.ifBlank { "No asignado" })
+                                InfoRow("Fecha", e.fecha)
+                                e.fechaEntrega?.let {
+                                    InfoRow("Fecha Entrega", it)
                                 }
+                                InfoRow("Estado", e.estado)
                             }
                         }
 
@@ -152,9 +124,46 @@ fun ResumenExamenScreen(
                                 )
                             }
                         }
+
+                        e.comentariosRevision?.takeIf { it.isNotBlank() }?.let { comentarios ->
+                            OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Text(
+                                        "Comentarios de Revisión",
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
+                                    Text(
+                                        text = comentarios,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "$label:",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }

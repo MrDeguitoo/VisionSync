@@ -155,7 +155,7 @@ fun LoginScreen(
 
             // Info de usuarios de prueba
             Text(
-                text = "Usuarios de prueba:\n• jduarte@gmail.com / 123456 (Tecnólogo)\n• mgarcia@gmail.com / 123456 (Médico)\n• pperez@gmail.com / 123456 (Paciente)",
+                text = "Usuarios de prueba:\n• jduarte@gmail.com / 123456 (Tecnólogo)\n• mgarcia@gmail.com / 123456 (Médico)\n• pperez@gmail.com / 123456 (Paciente)\n• aadmin@gmail.com / 123456 (Administrador)",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center

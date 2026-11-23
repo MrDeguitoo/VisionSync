@@ -26,9 +26,9 @@ import com.duoc.visionsyncc1.viewmodel.PacienteViewModel
 fun DashPacienteScreen(
     onVerResumen: (Int) -> Unit,
     onCerrarSesion: () -> Unit,
-    viewModel: PacienteViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: PacienteViewModel = viewmodel(factory = AppViewModelProvider.Factory)
 ) {
-    val listaAutorizados by viewModel.examenesAutorizados.collectAsState()
+    val listaAutorizados by viewModel.examenesEntregados.collectAsState()
 
     Scaffold(
         topBar = {
@@ -66,7 +66,11 @@ fun DashPacienteScreen(
                     items(listaAutorizados, key = { it.id }) { examen ->
                         ExamenAutorizadoCard(
                             examen = examen,
-                            onClick = { onVerResumen(examen.id) }
+                            onClick = {
+                                // Log de auditoría VISUALIZAR antes de navegar
+                                // El ViewModel de ResumenExamen ya registra la auditoría al cargar
+                                onVerResumen(examen.id)
+                            }
                         )
                     }
                 }

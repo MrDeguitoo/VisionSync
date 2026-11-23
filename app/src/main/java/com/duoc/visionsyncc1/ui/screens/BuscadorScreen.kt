@@ -18,12 +18,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +42,15 @@ fun BuscadorScreen(
 ) {
     val busqueda by viewModel.busqueda.collectAsState()
     val tipoFiltro by viewModel.tipoFiltro.collectAsState()
+    val estadoFiltro by viewModel.estadoFiltro.collectAsState()
+    val sucursalFiltro by viewModel.sucursalFiltro.collectAsState()
+    val fechaInicio by viewModel.fechaInicio.collectAsState()
+    val fechaFin by viewModel.fechaFin.collectAsState()
     val examenes by viewModel.examenesFiltrados.collectAsState()
+
+    // Variables locales para los campos de fecha
+    var fechaInicioInput by remember { mutableStateOf<String>(fechaInicio) }
+    var fechaFinInput by remember { mutableStateOf<String>(fechaFin) }
 
     Scaffold(
         topBar = {
@@ -93,16 +97,44 @@ fun BuscadorScreen(
                 placeholder = "Buscar por nombre o RUT del paciente..."
             )
 
-            // Filter Chips
+            // Filter Chips - Tipo de Examen
             FilterChipsRow(
                 selectedTipo = tipoFiltro,
                 onTipoSeleccionado = viewModel::onTipoFiltroSeleccionado
             )
 
+            // Filter Chips - Estado
+            EstadoFilterChipsRow(
+                selectedEstado = estadoFiltro,
+                onEstadoSeleccionado = viewModel::onEstadoFiltroSeleccionado
+            )
+
+            // Filter Chips - Sucursal
+            SucursalFilterChipsRow(
+                selectedSucursal = sucursalFiltro,
+                onSucursalSeleccionado = viewModel::onSucursalFiltroSeleccionado
+            )
+
+            // Fecha Range Picker
+            FechaRangePicker(
+                fechaInicio = fechaInicioInput,
+                fechaFin = fechaFinInput,
+                onFechaInicioChange = { fechaInicioInput = it },
+                onFechaFinChange = { fechaFinInput = it },
+                onAplicar = { inicio, fin ->
+                    viewModel.onFechaRangoCambiado(inicio, fin)
+                },
+                onLimpiar = {
+                    fechaInicioInput = ""
+                    fechaFinInput = ""
+                    viewModel.onFechaRangoCambiado("", "")
+                }
+            )
+
             // Exam List
             if (examenes.isEmpty()) {
                 EstadoVacioCard(
-                    message = if (busqueda.isNotBlank() || tipoFiltro != null) {
+                    message = if (busqueda.isNotBlank() || tipoFiltro != null || estadoFiltro != null || sucursalFiltro != null || fechaInicio.isNotBlank() || fechaFin.isNotBlank()) {
                         "No se encontraron exámenes con los filtros actuales."
                     } else {
                         "No hay exámenes registrados."
@@ -258,6 +290,154 @@ private fun EstadoVacioCard(message: String) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
+        }
+    }
+}
+
+@Composable
+private fun EstadoFilterChipsRow(
+    selectedEstado: String?,
+    onEstadoSeleccionado: (String?) -> Unit
+) {
+    val estados = listOf("Pendiente", "Validado", "Entregado", "Observado", "Actualizado")
+
+    androidx.compose.foundation.layout.Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FilterChip(
+            selected = selectedEstado == null,
+            onClick = { onEstadoSeleccionado(null) },
+            label = { Text("Todos") },
+            leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = "Filtro estado") }
+        )
+
+        estados.forEach { estado ->
+            FilterChip(
+                selected = selectedEstado == estado,
+                onClick = { onEstadoSeleccionado(estado) },
+                label = { Text(estado) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SucursalFilterChipsRow(
+    selectedSucursal: String?,
+    onSucursalSeleccionado: (String?) -> Unit
+) {
+    // Hardcoded common sucursales for now - could be dynamic from data later
+    val sucursales = listOf("Sede Central", "Sucursal Norte", "Sucursal Sur", "Sucursal Este", "Sucursal Oeste")
+
+    androidx.compose.foundation.layout.Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FilterChip(
+            selected = selectedSucursal == null,
+            onClick = { onSucursalSeleccionado(null) },
+            label = { Text("Todas") },
+            leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = "Filtro sucursal") }
+        )
+
+        sucursales.forEach { sucursal ->
+            FilterChip(
+                selected = selectedSucursal == sucursal,
+                onClick = { onSucursalSeleccionado(sucursal) },
+                label = { Text(sucursal) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun FechaRangePicker(
+    fechaInicio: String,
+    fechaFin: String,
+    onFechaInicioChange: (String) -> Unit,
+    onFechaFinChange: (String) -> Unit,
+    onAplicar: (String, String) -> Unit,
+    onLimpiar: () -> Unit
+) {
+    val tieneFechas = fechaInicio.isNotBlank() && fechaFin.isNotBlank()
+
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Filtro por Fecha",
+                style = MaterialTheme.typography.titleSmall
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = fechaInicio,
+                    onValueChange = onFechaInicioChange,
+                    label = { Text("Desde (dd/MM/yyyy)") },
+                    placeholder = { Text("dd/MM/yyyy") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                OutlinedTextField(
+                    value = fechaFin,
+                    onValueChange = onFechaFinChange,
+                    label = { Text("Hasta (dd/MM/yyyy)") },
+                    placeholder = { Text("dd/MM/yyyy") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+
+            if (tieneFechas) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { onAplicar(fechaInicio, fechaFin) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Aplicar")
+                    }
+
+                    OutlinedButton(
+                        onClick = onLimpiar,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Limpiar")
+                    }
+                }
+            } else {
+                Button(
+                    onClick = { onAplicar(fechaInicio, fechaFin) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Aplicar filtro de fecha")
+                }
+            }
         }
     }
 }

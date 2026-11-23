@@ -30,13 +30,9 @@ class PacienteViewModel(
     private val pacienteRepository: PacienteRepository
 ) : ViewModel() {
 
-    // Estado de UI para registro/búsqueda
-    private val _uiState = MutableStateFlow(PacienteUIState())
-    val uiState: StateFlow<PacienteUIState> = _uiState.asStateFlow()
-
-    // Regla de negocio: la consulta SQL en el DAO filtra sólo 'Autorizado'
-    val examenesAutorizados: StateFlow<List<ExamenEntity>> =
-        examenRepository.observarAutorizados().stateIn(
+    // Regla de negocio: el paciente solo ve exámenes en estado 'Entregado'
+    val examenesEntregados: StateFlow<List<ExamenEntity>> =
+        repository.observarPorEstado("Entregado").stateIn(
             scope = viewModelScope,
             started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
