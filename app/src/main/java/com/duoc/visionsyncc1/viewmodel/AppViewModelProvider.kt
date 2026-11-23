@@ -13,7 +13,10 @@ import com.duoc.visionsyncc1.VisionSyncApp
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            PacienteViewModel(visionSyncApp().examenRepository)
+            PacienteViewModel(
+                examenRepository = visionSyncApp().examenRepository,
+                pacienteRepository = visionSyncApp().pacienteRepository
+            )
         }
         initializer {
             ResumenExamenViewModel(

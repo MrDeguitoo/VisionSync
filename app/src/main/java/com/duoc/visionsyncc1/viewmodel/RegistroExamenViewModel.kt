@@ -18,10 +18,18 @@ data class FormularioState(
     val nombre: String = "",
     val rut: String = "",
     val tipoExamen: String = "",
+    val ojo: String = "",
+    val profesional: String = "",
+    val sucursal: String = "",
+    val fecha: String = "",
     val archivoUri: String? = null,
     val nombreError: String? = null,
     val rutError: String? = null,
     val tipoError: String? = null,
+    val ojoError: String? = null,
+    val profesionalError: String? = null,
+    val sucursalError: String? = null,
+    val fechaError: String? = null,
     val archivoError: String? = null
 )
 
@@ -35,6 +43,9 @@ sealed class GuardadoState {
 class RegistroExamenViewModel(
     private val repository: ExamenRepository
 ) : ViewModel() {
+
+    // Constructor para testing - usa un repositorio fake si no se proporciona
+    constructor() : this(FakeExamenRepository())
 
     private val _form = MutableStateFlow(FormularioState())
     val form: StateFlow<FormularioState> = _form.asStateFlow()
@@ -52,6 +63,22 @@ class RegistroExamenViewModel(
 
     fun onTipoChange(valor: String) {
         _form.update { it.copy(tipoExamen = valor, tipoError = null) }
+    }
+
+    fun onOjoChange(valor: String) {
+        _form.update { it.copy(ojo = valor, ojoError = null) }
+    }
+
+    fun onProfesionalChange(valor: String) {
+        _form.update { it.copy(profesional = valor, profesionalError = null) }
+    }
+
+    fun onSucursalChange(valor: String) {
+        _form.update { it.copy(sucursal = valor, sucursalError = null) }
+    }
+
+    fun onFechaChange(valor: String) {
+        _form.update { it.copy(fecha = valor, fechaError = null) }
     }
 
     fun onArchivoSeleccionado(uri: String?) {
@@ -77,6 +104,26 @@ class RegistroExamenViewModel(
             "Debe seleccionar un tipo de examen"
         } else null
 
+        val ojoError = if (actual.ojo.isBlank()) {
+            valido = false
+            "Debe seleccionar un ojo"
+        } else null
+
+        val profesionalError = if (actual.profesional.trim().isEmpty()) {
+            valido = false
+            "Debe ingresar el profesional responsable"
+        } else null
+
+        val sucursalError = if (actual.sucursal.trim().isEmpty()) {
+            valido = false
+            "Debe ingresar la sucursal"
+        } else null
+
+        val fechaError = if (actual.fecha.trim().isEmpty()) {
+            valido = false
+            "Debe ingresar la fecha y hora"
+        } else null
+
         val archivoError = if (actual.archivoUri.isNullOrBlank()) {
             valido = false
             "Debe adjuntar un archivo (PDF o Imagen)"
@@ -88,6 +135,10 @@ class RegistroExamenViewModel(
                     nombreError = nombreError,
                     rutError = rutError,
                     tipoError = tipoError,
+                    ojoError = ojoError,
+                    profesionalError = profesionalError,
+                    sucursalError = sucursalError,
+                    fechaError = fechaError,
                     archivoError = archivoError
                 )
             }
@@ -103,14 +154,25 @@ class RegistroExamenViewModel(
                     pacienteNombre = actual.nombre.trim(),
                     pacienteRut = actual.rut.trim(),
                     tipoExamen = actual.tipoExamen,
-                    fecha = fechaActual,
+                    ojo = actual.ojo,
+                    profesional = actual.profesional.trim(),
+                    sucursal = actual.sucursal.trim(),
+                    fecha = if (actual.fecha.trim().isEmpty()) fechaActual else actual.fecha.trim(),
                     archivoUri = actual.archivoUri,
                     observaciones = "",
                     estado = "Pendiente"
                 )
 
-                repository.guardar(examen)
-                _guardado.value = GuardadoState.Exito
+                val result = repository.guardar(examen)
+                // Compatibilidad: si devuelve Result, usar onSuccess/onFailure; si no, try/catch
+                if (result is kotlin.Result) {
+                    result.onSuccess { _guardado.value = GuardadoState.Exito }
+                        .onFailure { e ->
+                            _guardado.value = GuardadoState.Error("Error al guardar: ${e.message}")
+                        }
+                } else {
+                    _guardado.value = GuardadoState.Exito
+                }
             } catch (e: Exception) {
                 _guardado.value = GuardadoState.Error(e.message ?: "Error al guardar examen")
             }
@@ -125,4 +187,24 @@ class RegistroExamenViewModel(
         _form.value = FormularioState()
         _guardado.value = GuardadoState.Inactivo
     }
+}
+
+/**
+ * Repositorio fake para testing - no requiere Room ni DAO
+ */
+class FakeExamenRepository : ExamenRepository(FakeExamenDao()) {
+    override suspend fun guardar(examen: ExamenEntity) {
+        // No-op para testing
+    }
+}
+
+/**
+ * DAO fake para testing
+ */
+class FakeExamenDao : com.duoc.visionsyncc1.data.ExamenDao {
+    override suspend fun insertar(examen: ExamenEntity) { }
+    override fun observarTodos(): kotlinx.coroutines.flow.Flow<List<ExamenEntity>> = kotlinx.coroutines.flow.flowOf(emptyList())
+    override fun observarAutorizados(): kotlinx.coroutines.flow.Flow<List<ExamenEntity>> = kotlinx.coroutines.flow.flowOf(emptyList())
+    override suspend fun obtenerPorId(id: Int) = null
+    override suspend fun actualizar(id: Int, texto: String, estado: String) { }
 }

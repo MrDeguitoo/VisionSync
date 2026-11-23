@@ -4,11 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,8 +21,6 @@ import androidx.compose.ui.unit.sp
 import com.duoc.visionsyncc1.network.SyncState
 import com.duoc.visionsyncc1.network.SyncStateManager
 import com.duoc.visionsyncc1.VisionSyncApp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
 
 private val ColorExito = Color(0xFF20A39E)
 private val ColorSinConexion = Color(0xFFB3261E)
@@ -40,24 +42,29 @@ fun EstadoConexion(modifier: Modifier = Modifier) {
 /** Versión sin estado: sirve para @Preview y pruebas. */
 @Composable
 fun EstadoConexionPill(syncState: SyncState, modifier: Modifier = Modifier) {
-    val (color, texto) = when (syncState) {
-        is SyncState.Sincronizado -> ColorExito to "Sincronizado"
-        is SyncState.Pendiente -> ColorPendiente to "Sincronización pendiente (${syncState.count})"
-        is SyncState.Error -> ColorError to "Error: ${syncState.mensaje}"
-        SyncState.Offline -> ColorSinConexion to "Modo offline"
+    val (color, texto, descripcion, conectado) = when (syncState) {
+        is SyncState.Sincronizado -> MaterialTheme.colorScheme.tertiary to "Sincronizado" to "Estado de conexión: sincronizado" to true
+        is SyncState.Pendiente -> MaterialTheme.colorScheme.tertiary to "Sincronización pendiente (${syncState.count})" to "Estado de conexión: sincronización pendiente (${syncState.count})" to true
+        is SyncState.Error -> MaterialTheme.colorScheme.error to "Error: ${syncState.mensaje}" to "Estado de conexión: error - ${syncState.mensaje}" to false
+        SyncState.Offline -> MaterialTheme.colorScheme.error to "Modo offline" to "Estado de conexión: sin conexión, trabajando sin internet" to false
     }
 
     Row(
         modifier = modifier
             .background(color.copy(alpha = 0.12f), RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = descripcion
+                // Anuncia el cambio sin interrumpir lo que TalkBack está leyendo
+                liveRegion = LiveRegionMode.Polite
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(Modifier.size(8.dp).background(color, CircleShape))
         Spacer(Modifier.width(6.dp))
         Text(
             text = texto,
-            color = color, fontSize = 12.sp, fontWeight = FontWeight.SemiBold
+            color = color, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold
         )
     }
 }

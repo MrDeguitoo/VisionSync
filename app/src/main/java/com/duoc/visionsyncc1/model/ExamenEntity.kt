@@ -9,15 +9,17 @@ data class ExamenEntity(
     val pacienteNombre: String,
     val pacienteRut: String,
     val tipoExamen: String,
-    val fecha: String,
+    val ojo: String = "", // Derecho / Izquierdo / Ambos (para formulario)
+    val profesional: String = "", // Nombre del profesional (para formulario)
+    val sucursal: String = "", // Sucursal (para formulario)
+    val fecha: String, // Formato: yyyy-MM-dd HH:mm (para formulario)
     val archivoUri: String?,
+    val descripcionAccesible: String = "", // Texto alternativo para accesibilidad (PDF/imagen)
     val observaciones: String = "",
     val estado: String = "Pendiente", // Pendiente / Revisado / Autorizado
 
     // Campos extendidos (admin/auditoría)
     val ojoEvaluado: String = "",       // "OD" / "OI" / "AMBOS"
-    val sucursal: String = "",          // Sucursal donde se realizó
-    val profesional: String = "",       // Nombre del tecnólogo/médico
     val fechaRealizacion: String = "",  // Fecha real del examen (ISO 8601)
     val fechaValidacion: String = "",   // Cuando pasó a Revisado/Autorizado
     val estadoExtendido: String = "",   // "PENDIENTE_VALIDACION" / "VALIDADO" / "ENTREGADO" / "OBSERVADO"

@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+<<<<<<< HEAD
 /**
  * Repositorio Offline-First para exámenes.
  *
@@ -285,4 +286,3 @@ class ExamenRepository(
         return file
     }
 }
-

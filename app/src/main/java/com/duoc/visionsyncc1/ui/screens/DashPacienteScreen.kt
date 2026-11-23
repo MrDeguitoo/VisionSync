@@ -9,6 +9,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,10 +33,13 @@ fun DashPacienteScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Portal del Paciente") },
+                title = { Text("Portal del Paciente", modifier = Modifier.semantics { heading() }) },
                 actions = {
                     EstadoConexion()
-                    TextButton(onClick = onCerrarSesion) {
+                    TextButton(
+                        onClick = onCerrarSesion,
+                        modifier = Modifier.semantics { contentDescription = "Salir de la sesión" }
+                    ) {
                         Text("Salir", color = MaterialTheme.colorScheme.error)
                     }
                 }
@@ -48,6 +55,7 @@ fun DashPacienteScreen(
         ) {
             Text(
                 text = "Mis exámenes",
+                modifier = Modifier.semantics { heading() },
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -73,7 +81,7 @@ fun DashPacienteScreen(
 
 @Composable
 private fun EstadoVacioCard() {
-    OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+    OutlinedCard(modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) { }) {
         Column(
             modifier = Modifier
                 .padding(24.dp)
@@ -110,7 +118,12 @@ private fun ExamenAutorizadoCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .clearAndSetSemantics {
+                    contentDescription = "${examen.tipoExamen}. Paciente ${examen.pacienteNombre}. " +
+                            "Fecha ${examen.fecha}. Estado autorizado. Toca para ver el resumen."
+                },
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(

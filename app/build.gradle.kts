@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kover)
 }
 
 android {
@@ -60,6 +61,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.material.icons.extended)
 
+<<<<<<< HEAD
     // Retrofit & OkHttp
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
@@ -73,7 +75,16 @@ dependencies {
     // Serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // Coil 3 para carga de imágenes
+    implementation(libs.coil.compose)
+    // Telephoto para zoom en imágenes (compatible con Coil 3)
+    implementation(libs.telephoto.zoomable)
+    // PdfRenderer (android.graphics.pdf.PdfRenderer) viene en el SDK de Android, no requiere dependencia extra
+
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockwebserver)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,9 +94,22 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+}
 
-    // Tests
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockwebserver)
+kover {
+    reports {
+        filters {
+            includes {
+                packages(
+                    "com.duoc.visionsyncc1.viewmodel",
+                    "com.duoc.visionsyncc1.repository"
+                )
+            }
+        }
+        verify {
+            rule {
+                minBound(90)
+            }
+        }
+    }
 }

@@ -11,6 +11,7 @@ import com.duoc.visionsyncc1.repository.AuthRepository
 import com.duoc.visionsyncc1.repository.ConsultaRepository
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.repository.FhirRepository
+import com.duoc.visionsyncc1.repository.PacienteRepository
 import com.duoc.visionsyncc1.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +66,10 @@ class VisionSyncApp : Application() {
 
     val consultaRepository: ConsultaRepository by lazy {
         ConsultaRepository(database.consultaDao())
+    }
+
+    val pacienteRepository: PacienteRepository by lazy {
+        PacienteRepository(database.pacienteDao())
     }
 
     // Repositorio local de usuarios (para login offline/seed)

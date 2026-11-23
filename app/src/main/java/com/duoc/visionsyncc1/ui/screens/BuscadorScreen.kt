@@ -25,15 +25,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duoc.visionsyncc1.model.ExamenEntity
+import com.duoc.visionsyncc1.navigation.Rutas
 import com.duoc.visionsyncc1.ui.components.EstadoConexion
 import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
 import com.duoc.visionsyncc1.viewmodel.ExamenesViewModel
+import androidx.navigation.NavController
+import androidx.compose.material.icons.filled.People
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuscadorScreen(
     onExamenSeleccionado: (Int) -> Unit,
     onVolver: () -> Unit,
+    navController: NavController,
     viewModel: ExamenesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val busqueda by viewModel.busqueda.collectAsState()
@@ -51,13 +55,21 @@ fun BuscadorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Buscador de Exámenes") },
+                title = { Text("Buscador de Exámenes", modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
-                actions = { EstadoConexion() }
+                actions = {
+                    IconButton(
+                        onClick = { navController.navigate(Rutas.PACIENTES_PRUEBA) },
+                        modifier = Modifier.semantics { contentDescription = "Ver pacientes de prueba (API externa)" }
+                    ) {
+                        Icon(Icons.Default.People, contentDescription = null)
+                    }
+                    EstadoConexion()
+                }
             )
         }
     ) { padding ->
@@ -74,7 +86,7 @@ fun BuscadorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (busqueda.isNotBlank()) {
                         IconButton(onClick = { viewModel.onBusquedaCambiada("") }) {
@@ -161,7 +173,7 @@ private fun SearchBar(
         onValueChange = onValueChange,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .heightIn(min = 56.dp),
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         label = { Text(placeholder) },
@@ -188,7 +200,7 @@ private fun FilterChipsRow(
             selected = selectedTipo == null,
             onClick = { onTipoSeleccionado(null) },
             label = { Text("Todos") },
-            leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = "Filtro") }
+            leadingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) }
         )
 
         tipos.forEach { tipo ->
@@ -215,7 +227,12 @@ private fun ExamenCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .clearAndSetSemantics {
+                    contentDescription = "${examen.tipoExamen}. Paciente ${examen.pacienteNombre}. " +
+                            "RUT ${examen.pacienteRut}. Fecha ${examen.fecha}. Estado ${examen.estado}."
+                },
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
@@ -268,6 +285,7 @@ private fun EstadoVacioCard(message: String) {
             )
             Text(
                 text = message,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
