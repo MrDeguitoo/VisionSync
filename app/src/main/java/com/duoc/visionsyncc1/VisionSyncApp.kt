@@ -8,6 +8,7 @@ import com.duoc.visionsyncc1.network.NetworkModule
 import com.duoc.visionsyncc1.network.SyncStateManager
 import com.duoc.visionsyncc1.network.TokenStorage
 import com.duoc.visionsyncc1.repository.AuthRepository
+import com.duoc.visionsyncc1.repository.ConsultaRepository
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.repository.FhirRepository
 import com.duoc.visionsyncc1.repository.UserRepository
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 /**
- * Application class: crea la base de datos, red, repositorios y managers una sola vez
+ * Application class: crea la base de datos y los repositorios una sola vez
  * (Singleton) y los deja disponibles para AppViewModelProvider.
  */
 class VisionSyncApp : Application() {
@@ -60,6 +61,10 @@ class VisionSyncApp : Application() {
 
     val fhirRepository: FhirRepository by lazy {
         FhirRepository(fhirApi)
+    }
+
+    val consultaRepository: ConsultaRepository by lazy {
+        ConsultaRepository(database.consultaDao())
     }
 
     // Repositorio local de usuarios (para login offline/seed)
@@ -113,6 +118,12 @@ class VisionSyncApp : Application() {
                     passwordHash = passwordHash,
                     nombre = "Pedro Pérez",
                     rol = "PACIENTE"
+                ),
+                UserEntity(
+                    email = "admin@visionsync.cl",
+                    passwordHash = passwordHash,
+                    nombre = "Administrador",
+                    rol = "ADMINISTRADOR"
                 )
             )
 

@@ -9,5 +9,5 @@ data class UserEntity(
     val email: String,
     val passwordHash: String,
     val nombre: String,
-    val rol: String // "TECNOLOGO", "MEDICO", "PACIENTE"
+    val rol: String // "TECNOLOGO", "MEDICO", "PACIENTE", "ADMINISTRADOR"
 )

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class PacienteViewModel(
-    repository: ExamenRepository
+    private val repository: ExamenRepository
 ) : ViewModel() {
 
     // Regla de negocio: la consulta SQL en el DAO filtra sólo 'Autorizado'

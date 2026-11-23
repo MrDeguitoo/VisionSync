@@ -33,6 +33,13 @@ object AppViewModelProvider {
         initializer {
             DashTecnologoViewModel(visionSyncApp().examenRepository)
         }
+        initializer {
+            AdminViewModel(
+                visionSyncApp().examenRepository,
+                visionSyncApp().userRepository,
+                visionSyncApp().consultaRepository
+            )
+        }
         // Aquí se agregan los ViewModels de A y B cuando usen Room.
     }
 }
