@@ -53,13 +53,17 @@ interface ExamenDao {
     @Query("DELETE FROM examenes WHERE id = :id")
     suspend fun eliminar(id: Int)
 
-    // Upsert para sincronización desde servidor
+    // Upsert para sincronización desde servidor (incluye campos extendidos)
     @Query("""
         INSERT OR REPLACE INTO examenes
         (id, pacienteNombre, pacienteRut, tipoExamen, fecha, archivoUri, observaciones, estado,
+         ojoEvaluado, sucursal, profesional, fechaRealizacion, fechaValidacion, estadoExtendido,
+         comentarioValidacion, comentarioEntrega,
          remoteId, syncState, documentoLocalPath, actualizadoEn)
         VALUES
         (:id, :pacienteNombre, :pacienteRut, :tipoExamen, :fecha, :archivoUri, :observaciones, :estado,
+         :ojoEvaluado, :sucursal, :profesional, :fechaRealizacion, :fechaValidacion, :estadoExtendido,
+         :comentarioValidacion, :comentarioEntrega,
          :remoteId, :syncState, :documentoLocalPath, :actualizadoEn)
     """)
     suspend fun upsert(
@@ -71,9 +75,66 @@ interface ExamenDao {
         archivoUri: String?,
         observaciones: String,
         estado: String,
+        ojoEvaluado: String,
+        sucursal: String,
+        profesional: String,
+        fechaRealizacion: String,
+        fechaValidacion: String,
+        estadoExtendido: String,
+        comentarioValidacion: String,
+        comentarioEntrega: String,
         remoteId: Long?,
         syncState: String,
         documentoLocalPath: String?,
         actualizadoEn: String
     )
+
+    // ===== Filtros Admin =====
+
+    @Query("SELECT * FROM examenes WHERE estado = :estado ORDER BY id DESC")
+    fun observarPorEstado(estado: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT * FROM examenes WHERE sucursal = :sucursal ORDER BY id DESC")
+    fun observarPorSucursal(sucursal: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT * FROM examenes WHERE profesional = :profesional ORDER BY id DESC")
+    fun observarPorProfesional(profesional: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT * FROM examenes WHERE fechaRealizacion BETWEEN :inicio AND :fin ORDER BY id DESC")
+    fun observarPorRangoFechas(inicio: String, fin: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT * FROM examenes WHERE estadoExtendido = :estadoExt ORDER BY id DESC")
+    fun observarPorEstadoExtendido(estadoExt: String): Flow<List<ExamenEntity>>
+
+    @Query("SELECT DISTINCT sucursal FROM examenes WHERE sucursal IS NOT NULL AND sucursal != ''")
+    suspend fun obtenerSucursales(): List<String>
+
+    @Query("SELECT DISTINCT profesional FROM examenes WHERE profesional IS NOT NULL AND profesional != ''")
+    suspend fun obtenerProfesionales(): List<String>
+
+    // Transiciones de estado
+    @Query("UPDATE examenes SET estado = :nuevoEstado, estadoExtendido = :nuevoEstadoExt, fechaValidacion = :fecha, comentarioValidacion = :comentario WHERE id = :id")
+    suspend fun validarExamen(id: Int, nuevoEstado: String, nuevoEstadoExt: String, fecha: String, comentario: String)
+
+    @Query("UPDATE examenes SET estado = 'Entregado', estadoExtendido = 'ENTREGADO', comentarioEntrega = :comentario WHERE id = :id")
+    suspend fun entregarExamen(id: Int, comentario: String)
+
+    @Query("UPDATE examenes SET estado = :nuevoEstado, estadoExtendido = :nuevoEstadoExt, comentarioValidacion = :comentario WHERE id = :id")
+    suspend fun observarExamen(id: Int, nuevoEstado: String, nuevoEstadoExt: String, comentario: String)
+
+    // Stats para dashboard admin
+    @Query("SELECT COUNT(*) FROM examenes")
+    suspend fun contarTotal(): Int
+
+    @Query("SELECT COUNT(*) FROM examenes WHERE estado = 'Pendiente'")
+    suspend fun contarPendientesEstado(): Int
+
+    @Query("SELECT COUNT(*) FROM examenes WHERE estado = 'Revisado'")
+    suspend fun contarRevisados(): Int
+
+    @Query("SELECT COUNT(*) FROM examenes WHERE estado = 'Autorizado'")
+    suspend fun contarAutorizados(): Int
+
+    @Query("SELECT COUNT(*) FROM examenes WHERE estadoExtendido = 'OBSERVADO'")
+    suspend fun contarObservados(): Int
 }

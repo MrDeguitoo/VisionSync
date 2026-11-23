@@ -21,4 +21,13 @@ interface UserDao {
 
     @Query("DELETE FROM usuarios")
     suspend fun eliminarTodos()
+
+    @Query("SELECT * FROM usuarios")
+    suspend fun obtenerTodos(): List<UserEntity>
+
+    @Query("UPDATE usuarios SET email = :email, passwordHash = :passwordHash, nombre = :nombre, rol = :rol WHERE id = :id")
+    suspend fun actualizar(id: Int, email: String, passwordHash: String, nombre: String, rol: String)
+
+    @Query("DELETE FROM usuarios WHERE id = :id")
+    suspend fun eliminar(id: Int)
 }

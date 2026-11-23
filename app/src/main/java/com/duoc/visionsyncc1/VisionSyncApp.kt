@@ -8,6 +8,7 @@ import com.duoc.visionsyncc1.network.NetworkModule
 import com.duoc.visionsyncc1.network.SyncStateManager
 import com.duoc.visionsyncc1.network.TokenStorage
 import com.duoc.visionsyncc1.repository.AuthRepository
+import com.duoc.visionsyncc1.repository.ConsultaRepository
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.repository.FhirRepository
 import com.duoc.visionsyncc1.repository.UserRepository
@@ -62,6 +63,10 @@ class VisionSyncApp : Application() {
         FhirRepository(fhirApi)
     }
 
+    val consultaRepository: ConsultaRepository by lazy {
+        ConsultaRepository(database.consultaDao())
+    }
+
     // Repositorio local de usuarios (para login offline/seed)
     val userRepository: UserRepository by lazy {
         UserRepository(database.userDao())
@@ -113,6 +118,12 @@ class VisionSyncApp : Application() {
                     passwordHash = passwordHash,
                     nombre = "Pedro Pérez",
                     rol = "PACIENTE"
+                ),
+                UserEntity(
+                    email = "admin@visionsync.cl",
+                    passwordHash = passwordHash,
+                    nombre = "Administrador",
+                    rol = "ADMINISTRADOR"
                 )
             )
 

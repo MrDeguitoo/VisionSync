@@ -14,6 +14,16 @@ data class ExamenEntity(
     val observaciones: String = "",
     val estado: String = "Pendiente", // Pendiente / Revisado / Autorizado
 
+    // Campos extendidos (admin/auditoría)
+    val ojoEvaluado: String = "",       // "OD" / "OI" / "AMBOS"
+    val sucursal: String = "",          // Sucursal donde se realizó
+    val profesional: String = "",       // Nombre del tecnólogo/médico
+    val fechaRealizacion: String = "",  // Fecha real del examen (ISO 8601)
+    val fechaValidacion: String = "",   // Cuando pasó a Revisado/Autorizado
+    val estadoExtendido: String = "",   // "PENDIENTE_VALIDACION" / "VALIDADO" / "ENTREGADO" / "OBSERVADO"
+    val comentarioValidacion: String = "", // Comentario del médico al validar
+    val comentarioEntrega: String = "",    // Comentario al entregar al paciente
+
     // Campos de sincronización offline-first
     val remoteId: Long? = null,           // ID en el servidor (null = no sincronizado)
     val syncState: String = "PENDIENTE",  // SINCRONIZADO | PENDIENTE | ERROR
