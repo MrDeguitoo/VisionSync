@@ -46,7 +46,8 @@ fun AppNavigation(
         composable(Rutas.DASH_TECNOLOGO) {
             DashTecnologoScreen(
                 onNuevoExamen = { navController.navigate(Rutas.REGISTRO_EXAMEN) },
-                onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } }
+                onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } },
+                onVerFhir = { navController.navigate(Rutas.FHIR_PACIENTES) }
             )
         }
 
@@ -107,6 +108,13 @@ fun AppNavigation(
             val id = backStackEntry.arguments?.getInt("id") ?: -1
             ResumenExamenScreen(
                 examenId = id,
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        // API Externa: Pacientes FHIR
+        composable(Rutas.FHIR_PACIENTES) {
+            FhirPacientesScreen(
                 onVolver = { navController.popBackStack() }
             )
         }

@@ -11,5 +11,5 @@ object Rutas {
     const val DETALLE = "detalle/{id}"
     const val DASH_PACIENTE = "dash_paciente"
     const val RESUMEN = "resumen/{id}"
-
+    const val FHIR_PACIENTES = "fhir_pacientes"
 }

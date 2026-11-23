@@ -11,7 +11,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DashTecnologoScreen(
     onNuevoExamen: () -> Unit,
-    onCerrarSesion: () -> Unit
+    onCerrarSesion: () -> Unit,
+    onVerFhir: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -64,6 +65,17 @@ fun DashTecnologoScreen(
                     .height(54.dp)
             ) {
                 Text("+ Registrar Nuevo Examen", style = MaterialTheme.typography.titleMedium)
+            }
+
+            // Botón para ver pacientes FHIR (API externa)
+            OutlinedButton(
+                onClick = onVerFhir,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                )
+            ) {
+                Text("Ver Pacientes de Prueba (FHIR)", style = MaterialTheme.typography.titleSmall)
             }
 
             // Espacio reservado para histórico reactivo de Room

@@ -28,9 +28,9 @@ data class FormularioState(
 
 sealed class GuardadoState {
     data object Inactivo : GuardadoState()
-    data object  Guardando : GuardadoState()
+    data object Guardando : GuardadoState()
     data object Exito : GuardadoState()
-    data class Error(val mensaje : String) : GuardadoState()
+    data class Error(val mensaje: String) : GuardadoState()
 }
 
 class RegistroExamenViewModel(
@@ -62,6 +62,7 @@ class RegistroExamenViewModel(
     fun guardar() {
         val actual = _form.value
         var valido = true
+
         val nombreError = if (actual.nombre.trim().length < 3) {
             valido = false
             "El nombre debe tener al menos 3 caracteres"
@@ -94,23 +95,34 @@ class RegistroExamenViewModel(
             return
         }
 
-        // Generar fecha actual
-        val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-
-        // Guardar en Room
         viewModelScope.launch {
             _guardado.value = GuardadoState.Guardando
-            val examen = ExamenEntity(
-                pacienteNombre = actual.nombre.trim(),
-                pacienteRut = actual.rut.trim(),
-                tipoExamen = actual.tipoExamen,
-                fecha = fecha,
-                archivoUri = actual.archivoUri,
-                observaciones = "",
-                estado = "Pendiente"
-            )
-            repository.guardar(examen)
-            _guardado.value = GuardadoState.Exito
+            try {
+                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+
+                val examen = ExamenEntity(
+                    pacienteNombre = actual.nombre.trim(),
+                    pacienteRut = actual.rut.trim(),
+                    tipoExamen = actual.tipoExamen,
+                    fecha = fechaActual,
+                    archivoUri = actual.archivoUri,
+                    observaciones = "",
+                    estado = "Pendiente"
+                )
+
+                val result = repository.guardar(examen)
+                // Compatibilidad: si devuelve Result, usar onSuccess/onFailure; si no, try/catch
+                if (result is kotlin.Result) {
+                    result.onSuccess { _guardado.value = GuardadoState.Exito }
+                        .onFailure { e ->
+                            _guardado.value = GuardadoState.Error("Error al guardar: ${e.message}")
+                        }
+                } else {
+                    _guardado.value = GuardadoState.Exito
+                }
+            } catch (e: Exception) {
+                _guardado.value = GuardadoState.Error(e.message ?: "Error al guardar examen")
+            }
         }
     }
 
