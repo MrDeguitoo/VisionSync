@@ -2,6 +2,7 @@ package com.duoc.visionsyncc1
 
 import android.app.Application
 import com.duoc.visionsyncc1.data.AppDatabase
+import com.duoc.visionsyncc1.model.UserEntity
 import com.duoc.visionsyncc1.network.ExamenRemoteDataSourceImpl
 import com.duoc.visionsyncc1.network.NetworkModule
 import com.duoc.visionsyncc1.network.SyncStateManager
@@ -9,6 +10,7 @@ import com.duoc.visionsyncc1.network.TokenStorage
 import com.duoc.visionsyncc1.repository.AuthRepository
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.repository.FhirRepository
+import com.duoc.visionsyncc1.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -60,10 +62,17 @@ class VisionSyncApp : Application() {
         FhirRepository(fhirApi)
     }
 
+    // Repositorio local de usuarios (para login offline/seed)
+    val userRepository: UserRepository by lazy {
+        UserRepository(database.userDao())
+    }
+
     override fun onCreate() {
         super.onCreate()
         // Iniciar observación de conexión para sincronización automática
         iniciarObservacionConexion()
+        // Poblar base de datos con usuarios de prueba
+        poblarUsuariosPrueba()
     }
 
     private fun iniciarObservacionConexion() {
@@ -78,6 +87,36 @@ class VisionSyncApp : Application() {
                         examenRepository.refrescar()
                     }
                 }
+        }
+    }
+
+    private suspend fun poblarUsuariosPrueba() {
+        val count = database.userDao().contarUsuarios()
+        if (count == 0) {
+            val passwordHash = "123456" // En producción usar hash real (BCrypt)
+
+            val usuariosPrueba = listOf(
+                UserEntity(
+                    email = "jduarte@gmail.com",
+                    passwordHash = passwordHash,
+                    nombre = "José Duarte",
+                    rol = "TECNOLOGO"
+                ),
+                UserEntity(
+                    email = "mgarcia@gmail.com",
+                    passwordHash = passwordHash,
+                    nombre = "María García",
+                    rol = "MEDICO"
+                ),
+                UserEntity(
+                    email = "pperez@gmail.com",
+                    passwordHash = passwordHash,
+                    nombre = "Pedro Pérez",
+                    rol = "PACIENTE"
+                )
+            )
+
+            usuariosPrueba.forEach { database.userDao().insertar(it) }
         }
     }
 }
