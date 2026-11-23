@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.duoc.visionsyncc1.model.UserEntity
+import com.duoc.visionsyncc1.ui.components.VisorImagen
+import com.duoc.visionsyncc1.ui.components.VisorPdf
 import com.duoc.visionsyncc1.ui.screens.*
 import com.duoc.visionsyncc1.ui.screens.admin.*
 
@@ -50,6 +52,7 @@ fun AppNavigation(
         composable(Rutas.DASH_TECNOLOGO) {
             DashTecnologoScreen(
                 onNuevoExamen = { navController.navigate(Rutas.REGISTRO_EXAMEN) },
+                onGestionarPacientes = { navController.navigate(Rutas.PACIENTE) },
                 onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } },
                 onVerFhir = { navController.navigate(Rutas.FHIR_PACIENTES) }
             )
@@ -71,13 +74,25 @@ fun AppNavigation(
             )
         }
 
+        // Pantalla de Pacientes (Tecnólogo)
+        composable(Rutas.PACIENTE) {
+            PacienteScreen(
+                onVolver = { navController.popBackStack() },
+                onPacienteSeleccionado = { nombre, rut ->
+                    navController.popBackStack()
+                    // Pasar los datos al formulario de examen vía ViewModel
+                }
+            )
+        }
+
         // Flujo Médico - Dashboard (Buscador)
         composable(Rutas.DASH_MEDICO) {
             BuscadorScreen(
                 onExamenSeleccionado = { id ->
                     navController.navigate(Rutas.DETALLE.replace("{id}", id.toString()))
                 },
-                onVolver = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } }
+                onVolver = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } },
+                navController = navController
             )
         }
 
@@ -159,6 +174,49 @@ fun AppNavigation(
         // Admin Auditoría
         composable(Rutas.ADMIN_AUDITORIA) {
             AdminAuditoriaScreen(
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        // Visor de PDF
+        composable(
+            route = "${Rutas.VISOR_PDF}?archivoUri={archivoUri}&descripcion={descripcion}",
+            arguments = listOf(
+                navArgument("archivoUri") { type = NavType.StringType; defaultValue = "" },
+                navArgument("descripcion") { type = NavType.StringType; defaultValue = "Informe médico" }
+            )
+        ) { backStackEntry ->
+            val archivoUri = backStackEntry.arguments?.getString("archivoUri") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: "Informe médico"
+            val archivo = java.io.File(archivoUri)
+            VisorPdf(
+                archivo = archivo,
+                descripcionAccesible = descripcion,
+                onCerrar = { navController.popBackStack() }
+            )
+        }
+
+        // Visor de Imagen
+        composable(
+            route = "${Rutas.VISOR_IMAGEN}?archivoUri={archivoUri}&descripcion={descripcion}",
+            arguments = listOf(
+                navArgument("archivoUri") { type = NavType.StringType; defaultValue = "" },
+                navArgument("descripcion") { type = NavType.StringType; defaultValue = "Imagen médica" }
+            )
+        ) { backStackEntry ->
+            val archivoUri = backStackEntry.arguments?.getString("archivoUri") ?: ""
+            val descripcion = backStackEntry.arguments?.getString("descripcion") ?: "Imagen médica"
+            val archivo = java.io.File(archivoUri)
+            VisorImagen(
+                archivo = archivo,
+                descripcion = descripcion,
+                onCerrar = { navController.popBackStack() }
+            )
+        }
+
+        // Pantalla de Pacientes de Prueba (API Externa) - Rol Médico
+        composable(Rutas.PACIENTES_PRUEBA) {
+            PacientesPruebaScreen(
                 onVolver = { navController.popBackStack() }
             )
         }

@@ -1,6 +1,8 @@
 package com.duoc.visionsyncc1.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -8,6 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -34,7 +42,7 @@ fun LoginScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("VisionSync - Iniciar Sesión") },
+                title = { Text("VisionSync - Iniciar Sesión", modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(
@@ -50,7 +58,8 @@ fun LoginScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(24.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -61,6 +70,7 @@ fun LoginScreen(
             ) {
                 Text(
                     text = "VisionSync",
+                    modifier = Modifier.semantics { heading() },
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -85,7 +95,9 @@ fun LoginScreen(
                 },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { uiState.emailError?.let { error(it) } }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -102,7 +114,9 @@ fun LoginScreen(
                     uiState.contrasenaError?.let { Text(it) }
                 },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { uiState.contrasenaError?.let { error(it) } }
             )
 
             // Error general
@@ -110,6 +124,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = error,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error
                 )
@@ -121,12 +136,14 @@ fun LoginScreen(
                 onClick = { viewModel.intentarLogin() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .heightIn(min = 50.dp),
                 enabled = !uiState.loginExitoso
             ) {
                 if (uiState.loginExitoso) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .semantics { contentDescription = "Iniciando sesión" },
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
@@ -140,7 +157,7 @@ fun LoginScreen(
             Text(
                 text = "Usuarios de prueba:\n• jduarte@gmail.com / 123456 (Tecnólogo)\n• mgarcia@gmail.com / 123456 (Médico)\n• pperez@gmail.com / 123456 (Paciente)",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }

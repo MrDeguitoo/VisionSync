@@ -1,15 +1,12 @@
 package com.duoc.visionsyncc1.ui.screens
 
-import android.content.Intent
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -19,9 +16,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.unit.dp
+import android.net.Uri
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duoc.visionsyncc1.model.ExamenEntity
+import com.duoc.visionsyncc1.navigation.Rutas
 import com.duoc.visionsyncc1.ui.components.EstadoConexion
 import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
 import com.duoc.visionsyncc1.viewmodel.ExamenesViewModel
@@ -36,6 +43,7 @@ fun DetalleExamenScreen(
 ) {
     val examenes by viewModel.examenesFiltrados.collectAsState()
     val examen = examenes.find { it.id == examenId }
+    val navController = rememberNavController()
 
     var observaciones by remember { mutableStateOf("") }
     var mostrarError by remember { mutableStateOf(false) }
@@ -43,7 +51,7 @@ fun DetalleExamenScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle del Examen") },
+                title = { Text("Detalle del Examen", modifier = Modifier.semantics { heading() }) },
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -69,13 +77,6 @@ fun DetalleExamenScreen(
             } else {
                 val e = examen!!
 
-                // Launcher para ver el archivo adjunto
-                val viewFileLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartActivityForResult()
-                ) { result ->
-                    // No action needed on result
-                }
-
                 Column(
                     modifier = Modifier
                         .padding(20.dp)
@@ -95,6 +96,7 @@ fun DetalleExamenScreen(
                         ) {
                             Text(
                                 text = e.tipoExamen,
+                                modifier = Modifier.semantics { heading() },
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Divider()
@@ -102,37 +104,43 @@ fun DetalleExamenScreen(
                             InfoRow("RUT", e.pacienteRut)
                             InfoRow("Fecha", e.fecha)
                             e.archivoUri?.let { uri ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Archivo adjunto:",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                val esPdf = uri.lowercase().endsWith(".pdf")
+                                val esImagen = uri.lowercase().matches(Regex(".*\\.(jpg|jpeg|png|bmp|webp)$"))
+                                val descripcion = e.descripcionAccesible.ifBlank { "${e.tipoExamen}, ${if (esPdf) "informe PDF" else "imagen médica"}" }
                                 Row(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "Disponible",
+                                        text = "Archivo adjunto:",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                    IconButton(onClick = {
-                                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                                            data = Uri.parse(uri)
-                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Disponible",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
+                                        IconButton(
+                                            onClick = {
+                                                val ruta = if (esPdf) Rutas.VISOR_PDF else Rutas.VISOR_IMAGEN
+                                                navController.navigate("$ruta?archivoUri=${Uri.encode(uri)}&descripcion=${Uri.encode(descripcion)}")
+                                            },
+                                            modifier = Modifier.semantics { contentDescription = if (esPdf) "Ver informe PDF" else "Ver imagen médica" }
+                                        ) {
+                                            Icon(
+                                                imageVector = if (esPdf) Icons.Default.PictureAsPdf else Icons.Default.Image,
+                                                contentDescription = null
+                                            )
                                         }
-                                        viewFileLauncher.launch(intent)
-                                    }) {
-                                        Icon(Icons.Default.PictureAsPdf, contentDescription = "Ver archivo adjunto")
                                     }
                                 }
-                            }
-                        } ?: InfoRow("Archivo adjunto", "Sin archivo")
+                            } ?: InfoRow("Archivo adjunto", "Sin archivo")
                             InfoRow("Estado actual", e.estado)
                         }
                     }
@@ -145,6 +153,7 @@ fun DetalleExamenScreen(
                         ) {
                             Text(
                                 text = "Observaciones Médicas",
+                                modifier = Modifier.semantics { heading() },
                                 style = MaterialTheme.typography.titleMedium
                             )
 
@@ -157,7 +166,11 @@ fun DetalleExamenScreen(
                                     }
                                 },
                                 label = { Text("Escribe tus observaciones...") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .semantics {
+                                        if (mostrarError) error("Las observaciones no pueden estar vacías.")
+                                    },
                                 minLines = 4,
                                 maxLines = 6,
                                 singleLine = false,
@@ -167,6 +180,7 @@ fun DetalleExamenScreen(
                             if (mostrarError) {
                                 Text(
                                     text = "Las observaciones no pueden estar vacías.",
+                                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
@@ -185,7 +199,6 @@ fun DetalleExamenScreen(
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !observaciones.trim().isEmpty(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
@@ -224,16 +237,22 @@ fun DetalleExamenScreen(
 @Composable
 private fun InfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) { },
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             text = "$label:",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        // weight(1f): el valor usa el espacio restante y baja de línea
+        // en vez de aplastarse cuando la fuente está ampliada.
         Text(
             text = value,
+            modifier = Modifier.weight(1f),
+            textAlign = androidx.compose.ui.text.style.TextAlign.End,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
