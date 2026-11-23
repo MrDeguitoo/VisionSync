@@ -5,15 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.duoc.visionsyncc1.model.ExamenEntity
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.util.rutValido
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
 
 data class FormularioState(
     val nombre: String = "",
@@ -110,16 +109,8 @@ class RegistroExamenViewModel(
                     estado = "Pendiente"
                 )
 
-                val result = repository.guardar(examen)
-                // Compatibilidad: si devuelve Result, usar onSuccess/onFailure; si no, try/catch
-                if (result is kotlin.Result) {
-                    result.onSuccess { _guardado.value = GuardadoState.Exito }
-                        .onFailure { e ->
-                            _guardado.value = GuardadoState.Error("Error al guardar: ${e.message}")
-                        }
-                } else {
-                    _guardado.value = GuardadoState.Exito
-                }
+                repository.guardar(examen)
+                _guardado.value = GuardadoState.Exito
             } catch (e: Exception) {
                 _guardado.value = GuardadoState.Error(e.message ?: "Error al guardar examen")
             }

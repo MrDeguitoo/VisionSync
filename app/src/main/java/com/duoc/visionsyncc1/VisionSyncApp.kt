@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 /**
- * Application class: crea la base de datos, red, repositorios y managers una sola vez
+ * Application class: crea la base de datos y los repositorios una sola vez
  * (Singleton) y los deja disponibles para AppViewModelProvider.
  */
 class VisionSyncApp : Application() {
