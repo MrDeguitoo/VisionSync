@@ -25,7 +25,13 @@ object AppViewModelProvider {
             RegistroExamenViewModel(visionSyncApp().examenRepository)
         }
         initializer {
-            LoginViewModel(visionSyncApp().userRepository)
+            LoginViewModel(visionSyncApp().authRepository)
+        }
+        initializer {
+            FhirViewModel(visionSyncApp().fhirRepository)
+        }
+        initializer {
+            DashTecnologoViewModel(visionSyncApp().examenRepository)
         }
         initializer {
             DashTecnologoViewModel(visionSyncApp().examenRepository)

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.duoc.visionsyncc1.model.ExamenEntity
 import com.duoc.visionsyncc1.model.UserEntity
 
-@Database(entities = [ExamenEntity::class, UserEntity::class], version = 2, exportSchema = false)
+@Database(entities = [ExamenEntity::class, UserEntity::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun examenDao(): ExamenDao
     abstract fun userDao(): UserDao
@@ -22,7 +22,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "visionsync.db"
-                ).fallbackToDestructiveMigration() // Para desarrollo, migración simple
+                ).fallbackToDestructiveMigration() // Para desarrollo, migración simple (los datos se vuelven a bajar del servidor)
                     .build().also { INSTANCE = it }
             }
     }
