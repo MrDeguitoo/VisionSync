@@ -90,8 +90,11 @@ class ExamenesViewModel(
                 estado = "Autorizado",
                 observaciones = observaciones.trim()
             )
-            repository.actualizarObservaciones(examenActualizado.id, examenActualizado.observaciones, examenActualizado.estado)
-            onExito()
+            val result = repository.actualizar(examenActualizado)
+            result.onSuccess { onExito() }
+                .onFailure { e ->
+                    // Error handled by repository (sync state updated)
+                }
         }
     }
 

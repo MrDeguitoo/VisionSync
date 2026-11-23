@@ -5,36 +5,31 @@ import androidx.lifecycle.viewModelScope
 import com.duoc.visionsyncc1.model.ExamenEntity
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.util.rutValido
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
 
 data class FormularioState(
     val nombre: String = "",
     val rut: String = "",
     val tipoExamen: String = "",
     val archivoUri: String? = null,
-    val ojoEvaluado: String = "Ambos",
-    val sucursal: String = "",
     val nombreError: String? = null,
     val rutError: String? = null,
     val tipoError: String? = null,
-    val archivoError: String? = null,
-    val ojoError: String? = null,
-    val sucursalError: String? = null
+    val archivoError: String? = null
 )
 
 sealed class GuardadoState {
     data object Inactivo : GuardadoState()
-    data object  Guardando : GuardadoState()
+    data object Guardando : GuardadoState()
     data object Exito : GuardadoState()
-    data class Error(val mensaje : String) : GuardadoState()
+    data class Error(val mensaje: String) : GuardadoState()
 }
 
 class RegistroExamenViewModel(
@@ -63,17 +58,10 @@ class RegistroExamenViewModel(
         _form.update { it.copy(archivoUri = uri, archivoError = null) }
     }
 
-    fun onOjoChange(valor: String) {
-        _form.update { it.copy(ojoEvaluado = valor, ojoError = null) }
-    }
-
-    fun onSucursalChange(valor: String) {
-        _form.update { it.copy(sucursal = valor, sucursalError = null) }
-    }
-
-    fun guardar(profesionalId: Int = 0, profesionalNombre: String = "") {
+    fun guardar() {
         val actual = _form.value
         var valido = true
+
         val nombreError = if (actual.nombre.trim().length < 3) {
             valido = false
             "El nombre debe tener al menos 3 caracteres"
@@ -94,54 +82,38 @@ class RegistroExamenViewModel(
             "Debe adjuntar un archivo (PDF o Imagen)"
         } else null
 
-        val ojoError = if (actual.ojoEvaluado.isBlank()) {
-            valido = false
-            "Debe seleccionar un ojo a evaluar"
-        } else null
-
-        val sucursalError = if (actual.sucursal.isBlank()) {
-            valido = false
-            "Debe seleccionar una sucursal"
-        } else null
-
         if (!valido) {
             _form.update {
                 it.copy(
                     nombreError = nombreError,
                     rutError = rutError,
                     tipoError = tipoError,
-                    archivoError = archivoError,
-                    ojoError = ojoError,
-                    sucursalError = sucursalError
+                    archivoError = archivoError
                 )
             }
             return
         }
 
-        // Generar fecha actual
-        val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-
-        // Guardar en Room
         viewModelScope.launch {
             _guardado.value = GuardadoState.Guardando
-            val examen = ExamenEntity(
-                pacienteNombre = actual.nombre.trim(),
-                pacienteRut = actual.rut.trim(),
-                tipoExamen = actual.tipoExamen,
-                fecha = fecha,
-                archivoUri = actual.archivoUri,
-                observaciones = "",
-                estado = "Pendiente",
-                ojoEvaluado = actual.ojoEvaluado,
-                sucursal = actual.sucursal,
-                profesionalId = profesionalId,
-                profesionalNombre = profesionalNombre,
-                comentariosRevision = "",
-                fechaEntrega = null,
-                fechaActualizacion = null
-            )
-            repository.guardar(examen)
-            _guardado.value = GuardadoState.Exito
+            try {
+                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+
+                val examen = ExamenEntity(
+                    pacienteNombre = actual.nombre.trim(),
+                    pacienteRut = actual.rut.trim(),
+                    tipoExamen = actual.tipoExamen,
+                    fecha = fechaActual,
+                    archivoUri = actual.archivoUri,
+                    observaciones = "",
+                    estado = "Pendiente"
+                )
+
+                repository.guardar(examen)
+                _guardado.value = GuardadoState.Exito
+            } catch (e: Exception) {
+                _guardado.value = GuardadoState.Error(e.message ?: "Error al guardar examen")
+            }
         }
     }
 

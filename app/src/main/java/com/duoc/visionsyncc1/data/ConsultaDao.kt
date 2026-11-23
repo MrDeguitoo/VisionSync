@@ -7,15 +7,21 @@ import androidx.room.*
 @Dao
 interface ConsultaDao {
 
-    @Insert
-    suspend fun insertar(consulta: ConsultaEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertar(consulta: ConsultaEntity): Long
 
-    @Query("SELECT * FROM consultas WHERE examenId = :examenId ORDER BY id DESC")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertarTodos(consultas: List<ConsultaEntity>)
+
+    @Query("SELECT * FROM consultas WHERE examenId = :examenId ORDER BY fecha DESC")
     fun observarPorExamen(examenId: Int): Flow<List<ConsultaEntity>>
 
-    @Query("SELECT * FROM consultas ORDER BY id DESC")
-    fun observarTodas(): Flow<List<ConsultaEntity>>
+    @Query("SELECT * FROM consultas WHERE usuarioId = :usuarioId ORDER BY fecha DESC")
+    fun observarPorUsuario(usuarioId: Int): Flow<List<ConsultaEntity>>
 
-    @Query("SELECT COUNT(*) FROM consultas WHERE examenId = :examenId")
-    suspend fun contarPorExamen(examenId: Int): Int
+    @Query("SELECT * FROM consultas ORDER BY fecha DESC LIMIT :limit")
+    fun observarUltimas(limit: Int): Flow<List<ConsultaEntity>>
+
+    @Query("SELECT COUNT(*) FROM consultas")
+    suspend fun contarTotal(): Int
 }

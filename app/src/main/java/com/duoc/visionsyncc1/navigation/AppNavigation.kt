@@ -10,8 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.duoc.visionsyncc1.model.UserEntity
 import com.duoc.visionsyncc1.ui.screens.*
-import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.duoc.visionsyncc1.ui.screens.admin.*
 
 @Composable
 fun AppNavigation(
@@ -37,7 +36,7 @@ fun AppNavigation(
                         "PACIENTE" -> navController.navigate(Rutas.DASH_PACIENTE) {
                             popUpTo(Rutas.LOGIN) { inclusive = true }
                         }
-                        "ADMINISTRADOR" -> navController.navigate(Rutas.ADMIN_DASHBOARD) {
+                        "ADMINISTRADOR" -> navController.navigate(Rutas.DASH_ADMIN) {
                             popUpTo(Rutas.LOGIN) { inclusive = true }
                         }
                         else -> navController.navigate(Rutas.LOGIN)
@@ -51,7 +50,8 @@ fun AppNavigation(
         composable(Rutas.DASH_TECNOLOGO) {
             DashTecnologoScreen(
                 onNuevoExamen = { navController.navigate(Rutas.REGISTRO_EXAMEN) },
-                onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } }
+                onCerrarSesion = { navController.navigate(Rutas.LOGIN) { popUpTo(Rutas.LOGIN) { inclusive = true } } },
+                onVerFhir = { navController.navigate(Rutas.FHIR_PACIENTES) }
             )
         }
 
@@ -116,10 +116,18 @@ fun AppNavigation(
             )
         }
 
-        // Admin Dashboard
-        composable(Rutas.ADMIN_DASHBOARD) {
+        // API Externa: Pacientes FHIR
+        composable(Rutas.FHIR_PACIENTES) {
+            FhirPacientesScreen(
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        // ===== ADMIN ROUTES =====
+        // Dashboard Admin
+        composable(Rutas.DASH_ADMIN) {
             AdminDashboardScreen(
-                onGestionUsuarios = { navController.navigate(Rutas.ADMIN_USUARIOS) },
+                onUsuarios = { navController.navigate(Rutas.ADMIN_USUARIOS) },
                 onCatalogo = { navController.navigate(Rutas.ADMIN_CATALOGO) },
                 onDatosPrueba = { navController.navigate(Rutas.ADMIN_DATOS_PRUEBA) },
                 onAuditoria = { navController.navigate(Rutas.ADMIN_AUDITORIA) },
@@ -127,28 +135,28 @@ fun AppNavigation(
             )
         }
 
-        // Admin - Gestión de Usuarios
+        // Admin Usuarios
         composable(Rutas.ADMIN_USUARIOS) {
             AdminUsuariosScreen(
                 onVolver = { navController.popBackStack() }
             )
         }
 
-        // Admin - Catálogo de Exámenes
+        // Admin Catálogo
         composable(Rutas.ADMIN_CATALOGO) {
             AdminCatalogoScreen(
                 onVolver = { navController.popBackStack() }
             )
         }
 
-        // Admin - Generar Datos de Prueba
+        // Admin Datos de Prueba
         composable(Rutas.ADMIN_DATOS_PRUEBA) {
             AdminDatosPruebaScreen(
                 onVolver = { navController.popBackStack() }
             )
         }
 
-        // Admin - Auditoría de Consultas
+        // Admin Auditoría
         composable(Rutas.ADMIN_AUDITORIA) {
             AdminAuditoriaScreen(
                 onVolver = { navController.popBackStack() }

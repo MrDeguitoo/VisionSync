@@ -3,7 +3,9 @@ package com.duoc.visionsyncc1.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duoc.visionsyncc1.model.UserEntity
-import com.duoc.visionsyncc1.repository.UserRepository
+import com.duoc.visionsyncc1.repository.AuthRepository
+import com.duoc.visionsyncc1.repository.LoginResult
+import com.duoc.visionsyncc1.repository.toUserEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +23,7 @@ data class LoginUiState(
 )
 
 class LoginViewModel(
-    private val userRepository: UserRepository
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -67,37 +69,27 @@ class LoginViewModel(
             return
         }
 
-        // Autenticación real contra Room
+        // Autenticación real contra backend
         viewModelScope.launch {
-            val usuario = userRepository.obtenerPorEmail(estadoActual.email.trim().lowercase())
+            val result = authRepository.login(estadoActual.email.trim(), estadoActual.contrasena)
 
-            if (usuario == null) {
+            result.onSuccess { loginResult ->
+                // Login exitoso - crear UserEntity para navegación
+                val usuario = loginResult.toUserEntity()
                 _uiState.update {
                     it.copy(
-                        emailError = "No existe un usuario con este email",
+                        loginExitoso = true,
+                        usuario = usuario,
+                        errorGeneral = null
+                    )
+                }
+            }.onFailure { e ->
+                _uiState.update {
+                    it.copy(
+                        errorGeneral = "Error de conexión: ${e.message}",
                         loginExitoso = false
                     )
                 }
-                return@launch
-            }
-
-            if (!userRepository.verificarContrasena(estadoActual.contrasena, usuario.passwordHash)) {
-                _uiState.update {
-                    it.copy(
-                        contrasenaError = "Contraseña incorrecta",
-                        loginExitoso = false
-                    )
-                }
-                return@launch
-            }
-
-            // Login exitoso
-            _uiState.update {
-                it.copy(
-                    loginExitoso = true,
-                    usuario = usuario,
-                    errorGeneral = null
-                )
             }
         }
     }

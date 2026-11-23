@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class PacienteViewModel(
-    repository: ExamenRepository
+    private val repository: ExamenRepository
 ) : ViewModel() {
 
     // Regla de negocio: el paciente solo ve exámenes en estado 'Entregado'

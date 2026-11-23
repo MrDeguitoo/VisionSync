@@ -24,7 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "visionsync.db"
-                ).fallbackToDestructiveMigration() // Para desarrollo, migración simple
+                ).fallbackToDestructiveMigration() // Para desarrollo, migración simple (los datos se vuelven a bajar del servidor)
                     .build().also { INSTANCE = it }
             }
     }

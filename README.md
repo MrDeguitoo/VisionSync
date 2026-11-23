@@ -113,6 +113,7 @@ Los exámenes en estado **Pendiente** o **Revisado** son de exclusivo uso clíni
 | **Diego Uribe** | Integrante A | Navegación, Login, Formulario de Registro de Examen, validaciones (RUT módulo 11), Recurso Nativo 1 (SAF) y ViewModel Factory. | `feature/registro-examen`<br>`feature/mejoras-tecnologo` |
 | **Job Arjel** | Integrante B | Arquitectura Room (Entity, DAO, Database, Repository), precarga de datos de prueba, Dashboard Médico, Buscador reactivo y Detalle con observaciones. | `feature/room-datos` |
 | **Sebastián Díaz** | Integrante C | Portal del Paciente (listado y resumen de autorizados), Recurso Nativo 2 (conectividad y permisos), gestión de tablero Trello y documentación técnica. | `feature/portal-paciente` |
+| **Isidora Ayala** | Integrante D | Calidad de código, firma de commits, documentación técnica y revisión de evidencias. | `feature/calidad-firma-docs` |
 
 ### 6.2 Gestión y Trazabilidad en Trello
 La planificación ágil y el avance de los sprints se gestionan en el tablero oficial:  
