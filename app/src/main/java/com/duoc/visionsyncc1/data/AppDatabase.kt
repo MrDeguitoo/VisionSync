@@ -5,11 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duoc.visionsyncc1.model.ExamenEntity
+import com.duoc.visionsyncc1.model.PacienteEntity
 import com.duoc.visionsyncc1.model.UserEntity
 
-@Database(entities = [ExamenEntity::class, UserEntity::class], version = 2, exportSchema = false)
+@Database(entities = [ExamenEntity::class, PacienteEntity::class, UserEntity::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun examenDao(): ExamenDao
+    abstract fun pacienteDao(): PacienteDao
     abstract fun userDao(): UserDao
 
     companion object {

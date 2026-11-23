@@ -49,6 +49,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.material.icons.extended)
 
+    // Coil 3 para carga de imágenes
+    implementation(libs.coil.compose)
+    // Telephoto para zoom en imágenes (compatible con Coil 3)
+    implementation(libs.telephoto.zoomable)
+    // PdfRenderer (android.graphics.pdf.PdfRenderer) viene en el SDK de Android, no requiere dependencia extra
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

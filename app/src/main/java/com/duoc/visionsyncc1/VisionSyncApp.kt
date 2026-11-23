@@ -4,6 +4,7 @@ import android.app.Application
 import com.duoc.visionsyncc1.data.AppDatabase
 import com.duoc.visionsyncc1.model.UserEntity
 import com.duoc.visionsyncc1.repository.ExamenRepository
+import com.duoc.visionsyncc1.repository.PacienteRepository
 import com.duoc.visionsyncc1.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,10 @@ class VisionSyncApp : Application() {
 
     val examenRepository: ExamenRepository by lazy {
         ExamenRepository(database.examenDao())
+    }
+
+    val pacienteRepository: PacienteRepository by lazy {
+        PacienteRepository(database.pacienteDao())
     }
 
     val userRepository: UserRepository by lazy {

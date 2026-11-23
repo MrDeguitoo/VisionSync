@@ -13,7 +13,10 @@ import com.duoc.visionsyncc1.VisionSyncApp
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            PacienteViewModel(visionSyncApp().examenRepository)
+            PacienteViewModel(
+                examenRepository = visionSyncApp().examenRepository,
+                pacienteRepository = visionSyncApp().pacienteRepository
+            )
         }
         initializer {
             ResumenExamenViewModel(visionSyncApp().examenRepository)
@@ -26,6 +29,9 @@ object AppViewModelProvider {
         }
         initializer {
             LoginViewModel(visionSyncApp().userRepository)
+        }
+        initializer {
+            PacientesPruebaViewModel()
         }
         // Aquí se agregan los ViewModels de A y B cuando usen Room.
     }

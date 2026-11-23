@@ -9,8 +9,12 @@ data class ExamenEntity(
     val pacienteNombre: String,
     val pacienteRut: String,
     val tipoExamen: String,
-    val fecha: String,
+    val ojo: String = "", // Derecho / Izquierdo / Ambos
+    val profesional: String = "",
+    val sucursal: String = "",
+    val fecha: String, // Formato: yyyy-MM-dd HH:mm
     val archivoUri: String?,
+    val descripcionAccesible: String = "", // Texto alternativo para accesibilidad (PDF/imagen)
     val observaciones: String = "",
     val estado: String = "Pendiente" // Pendiente / Revisado / Autorizado
 )

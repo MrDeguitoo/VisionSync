@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DashTecnologoScreen(
     onNuevoExamen: () -> Unit,
+    onGestionarPacientes: () -> Unit,
     onCerrarSesion: () -> Unit
 ) {
     Scaffold(
@@ -75,6 +76,19 @@ fun DashTecnologoScreen(
                     .semantics { contentDescription = "Registrar nuevo examen" }
             ) {
                 Text("+ Registrar Nuevo Examen", style = MaterialTheme.typography.titleMedium)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Botón gestionar pacientes
+            OutlinedButton(
+                onClick = onGestionarPacientes,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 54.dp)
+                    .semantics { contentDescription = "Gestionar pacientes" }
+            ) {
+                Text("Gestionar Pacientes", style = MaterialTheme.typography.titleMedium)
             }
 
             // Espacio reservado para histórico reactivo de Room

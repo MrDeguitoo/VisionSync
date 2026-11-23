@@ -1,15 +1,12 @@
 package com.duoc.visionsyncc1.ui.screens
 
-import android.content.Intent
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,12 +18,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.unit.dp
+import android.net.Uri
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duoc.visionsyncc1.model.ExamenEntity
+import com.duoc.visionsyncc1.navigation.Rutas
 import com.duoc.visionsyncc1.ui.components.EstadoConexion
 import com.duoc.visionsyncc1.viewmodel.AppViewModelProvider
 import com.duoc.visionsyncc1.viewmodel.ExamenesViewModel
@@ -41,6 +43,7 @@ fun DetalleExamenScreen(
 ) {
     val examenes by viewModel.examenesFiltrados.collectAsState()
     val examen = examenes.find { it.id == examenId }
+    val navController = rememberNavController()
 
     var observaciones by remember { mutableStateOf("") }
     var mostrarError by remember { mutableStateOf(false) }
@@ -74,13 +77,6 @@ fun DetalleExamenScreen(
             } else {
                 val e = examen!!
 
-                // Launcher para ver el archivo adjunto
-                val viewFileLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartActivityForResult()
-                ) { result ->
-                    // No action needed on result
-                }
-
                 Column(
                     modifier = Modifier
                         .padding(20.dp)
@@ -108,6 +104,9 @@ fun DetalleExamenScreen(
                             InfoRow("RUT", e.pacienteRut)
                             InfoRow("Fecha", e.fecha)
                             e.archivoUri?.let { uri ->
+                                val esPdf = uri.lowercase().endsWith(".pdf")
+                                val esImagen = uri.lowercase().matches(Regex(".*\\.(jpg|jpeg|png|bmp|webp)$"))
+                                val descripcion = e.descripcionAccesible.ifBlank { "${e.tipoExamen}, ${if (esPdf) "informe PDF" else "imagen médica"}" }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -127,14 +126,17 @@ fun DetalleExamenScreen(
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
-                                        IconButton(onClick = {
-                                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                                data = Uri.parse(uri)
-                                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                            }
-                                            viewFileLauncher.launch(intent)
-                                        }) {
-                                            Icon(Icons.Default.PictureAsPdf, contentDescription = "Ver archivo adjunto")
+                                        IconButton(
+                                            onClick = {
+                                                val ruta = if (esPdf) Rutas.VISOR_PDF else Rutas.VISOR_IMAGEN
+                                                navController.navigate("$ruta?archivoUri=${Uri.encode(uri)}&descripcion=${Uri.encode(descripcion)}")
+                                            },
+                                            modifier = Modifier.semantics { contentDescription = if (esPdf) "Ver informe PDF" else "Ver imagen médica" }
+                                        ) {
+                                            Icon(
+                                                imageVector = if (esPdf) Icons.Default.PictureAsPdf else Icons.Default.Image,
+                                                contentDescription = null
+                                            )
                                         }
                                     }
                                 }

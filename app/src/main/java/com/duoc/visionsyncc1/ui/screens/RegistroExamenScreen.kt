@@ -178,6 +178,83 @@ fun RegistroExamenScreen(
                 }
             }
 
+            // Selector Ojo (Material 3 Exposed Dropdown)
+            var expandedOjo by remember { mutableStateOf(false) }
+            val opcionesOjo = listOf("Derecho", "Izquierdo", "Ambos")
+
+            ExposedDropdownMenuBox(
+                expanded = expandedOjo,
+                onExpandedChange = { expandedOjo = it }
+            ) {
+                OutlinedTextField(
+                    value = formState.ojo,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Ojo *") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedOjo) },
+                    isError = formState.ojoError != null,
+                    supportingText = { formState.ojoError?.let { Text(it) } },
+                    modifier = Modifier
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        .fillMaxWidth()
+                        .semantics { formState.ojoError?.let { error(it) } }
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedOjo,
+                    onDismissRequest = { expandedOjo = false }
+                ) {
+                    opcionesOjo.forEach { ojo ->
+                        DropdownMenuItem(
+                            text = { Text(ojo) },
+                            onClick = {
+                                viewModel.onOjoChange(ojo)
+                                expandedOjo = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Campo Profesional
+            OutlinedTextField(
+                value = formState.profesional,
+                onValueChange = { viewModel.onProfesionalChange(it) },
+                label = { Text("Profesional Responsable *") },
+                placeholder = { Text("Ej. Dr. María González") },
+                isError = formState.profesionalError != null,
+                supportingText = { formState.profesionalError?.let { Text(it) } },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { formState.profesionalError?.let { error(it) } }
+            )
+
+            // Campo Sucursal
+            OutlinedTextField(
+                value = formState.sucursal,
+                onValueChange = { viewModel.onSucursalChange(it) },
+                label = { Text("Sucursal *") },
+                placeholder = { Text("Ej. Clínica Central") },
+                isError = formState.sucursalError != null,
+                supportingText = { formState.sucursalError?.let { Text(it) } },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { formState.sucursalError?.let { error(it) } }
+            )
+
+            // Campo Fecha y Hora
+            OutlinedTextField(
+                value = formState.fecha,
+                onValueChange = { viewModel.onFechaChange(it) },
+                label = { Text("Fecha y Hora *") },
+                placeholder = { Text("YYYY-MM-DD HH:MM") },
+                isError = formState.fechaError != null,
+                supportingText = { formState.fechaError?.let { Text(it) } },
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Text),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { formState.fechaError?.let { error(it) } }
+            )
+
             // Tarjeta de Selector de Archivo Nativo (SAF)
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth(),
