@@ -5,15 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.duoc.visionsyncc1.model.ExamenEntity
 import com.duoc.visionsyncc1.repository.ExamenRepository
 import com.duoc.visionsyncc1.util.rutValido
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
 
 data class FormularioState(
     val nombre: String = "",
@@ -28,9 +27,9 @@ data class FormularioState(
 
 sealed class GuardadoState {
     data object Inactivo : GuardadoState()
-    data object  Guardando : GuardadoState()
+    data object Guardando : GuardadoState()
     data object Exito : GuardadoState()
-    data class Error(val mensaje : String) : GuardadoState()
+    data class Error(val mensaje: String) : GuardadoState()
 }
 
 class RegistroExamenViewModel(
@@ -62,6 +61,7 @@ class RegistroExamenViewModel(
     fun guardar() {
         val actual = _form.value
         var valido = true
+
         val nombreError = if (actual.nombre.trim().length < 3) {
             valido = false
             "El nombre debe tener al menos 3 caracteres"
@@ -94,23 +94,26 @@ class RegistroExamenViewModel(
             return
         }
 
-        // Generar fecha actual
-        val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-
-        // Guardar en Room
         viewModelScope.launch {
             _guardado.value = GuardadoState.Guardando
-            val examen = ExamenEntity(
-                pacienteNombre = actual.nombre.trim(),
-                pacienteRut = actual.rut.trim(),
-                tipoExamen = actual.tipoExamen,
-                fecha = fecha,
-                archivoUri = actual.archivoUri,
-                observaciones = "",
-                estado = "Pendiente"
-            )
-            repository.guardar(examen)
-            _guardado.value = GuardadoState.Exito
+            try {
+                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+
+                val examen = ExamenEntity(
+                    pacienteNombre = actual.nombre.trim(),
+                    pacienteRut = actual.rut.trim(),
+                    tipoExamen = actual.tipoExamen,
+                    fecha = fechaActual,
+                    archivoUri = actual.archivoUri,
+                    observaciones = "",
+                    estado = "Pendiente"
+                )
+
+                repository.guardar(examen)
+                _guardado.value = GuardadoState.Exito
+            } catch (e: Exception) {
+                _guardado.value = GuardadoState.Error(e.message ?: "Error al guardar examen")
+            }
         }
     }
 
